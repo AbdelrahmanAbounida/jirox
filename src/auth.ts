@@ -1,11 +1,20 @@
-import NextAuth from "next-auth";
+import NextAuth, { DefaultSession } from "next-auth";
 import { UserRole } from "@prisma/client";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@/lib/db";
 import authConfig from "@/auth.config";
-import { getTwoFactorConfirmationByUserId } from "@/actions/verification/two-factor-confirmation";
+import { getTwoFactorConfirmationByUserId } from "@/actions/auth/verification/two-factor-confirmation";
 import { getAccountByUserId } from "./actions/auth/account";
 import { getUserById } from "./actions/auth/user";
+
+declare module "next-auth" {
+  interface Session {
+    // user: DefaultSession["user"] & {
+    //   isauth: boolean;
+    // };
+    accessToken: string;
+  }
+}
 
 export const {
   handlers: { GET, POST },

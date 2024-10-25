@@ -8,14 +8,14 @@ import { db } from "@/lib/db";
 import { signIn } from "@/auth";
 import { LoginSchema } from "@/schemas/auth-schemas";
 import { getUserByEmail } from "./user";
-import { getTwoFactorTokenByEmail } from "@/actions/verification/two-factor-token";
+import { getTwoFactorTokenByEmail } from "@/actions/auth/verification/two-factor-token";
 import { sendVerificationEmail, sendTwoFactorTokenEmail } from "@/lib/mail";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import {
   generateVerificationToken,
   generateTwoFactorToken,
 } from "@/lib/tokens";
-import { getTwoFactorConfirmationByUserId } from "@/actions/verification/two-factor-confirmation";
+import { getTwoFactorConfirmationByUserId } from "@/actions/auth/verification/two-factor-confirmation";
 
 export const login = async (
   values: z.infer<typeof LoginSchema>,
