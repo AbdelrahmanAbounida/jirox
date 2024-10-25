@@ -1,0 +1,24 @@
+import React from "react";
+import { ThemeProvider } from "./theme-provider";
+import ModalsProvider from "./modals-provider";
+import { AuthProvider } from "./auth-provider";
+import { Toaster } from "@/components/ui/sonner";
+import { QueryClientProvider } from "./query-client-provider";
+
+export const AllProviders = async ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  return (
+    <AuthProvider>
+      <QueryClientProvider>
+        <ThemeProvider defaultTheme="light" attribute="class">
+          <Toaster richColors />
+          <ModalsProvider />
+          {children}
+        </ThemeProvider>
+      </QueryClientProvider>
+    </AuthProvider>
+  );
+};
