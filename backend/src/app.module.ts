@@ -13,6 +13,7 @@ import { RedisModule } from './common/services/redis/redis.module';
 import { UsersModule } from './modules/users/users.module';
 import { WorkspacesModule } from './modules/workspaces/workspaces.module';
 import { TasksModule } from './modules/tasks/tasks.module';
+import { ProjectsModule } from './modules/projects/projects.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { TasksModule } from './modules/tasks/tasks.module';
     RedisModule,
     WorkspacesModule,
     TasksModule,
+    ProjectsModule,
   ],
   controllers: [],
   providers: [
