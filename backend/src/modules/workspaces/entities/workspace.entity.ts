@@ -11,10 +11,4 @@ export class WorkspaceEntity extends AbstractEnttiy<WorkspaceEntity> {
 
   @Column({ type: 'text' })
   slug: string;
-
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
-
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  updated_at: Date;
 }
