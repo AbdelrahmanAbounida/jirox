@@ -20,7 +20,7 @@ import { CustomLogger } from 'src/common/logging/app-logger';
 // @Auth(USER_ROLE_ENUM.USER, true)
 // @UsePipes(ValidationPipe)
 
-@ApiSecurity('api-key')
+// @ApiSecurity('api-key')
 @Controller({
   version: '1',
   path: 'users',
@@ -47,7 +47,7 @@ export class UsersController {
 
   // @Serialize(CreateUserDto) // different method to serialize the response
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
+  async findOne(@Param('id', ParseIntPipe) id: string) {
     const user = await this.usersService.findUserById(id);
     if (!user) {
       return new NotFoundException('There is no user with this id');
@@ -57,7 +57,7 @@ export class UsersController {
 
   @Patch(':id')
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
     const user = await this.usersService.findUserById(id);
@@ -68,7 +68,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id', ParseIntPipe) id: string) {
     const user = await this.usersService.findUserById(id);
     console.log({ user });
     if (!user) {

@@ -11,6 +11,8 @@ import { CustomLogger } from './common/logging/app-logger';
 import { AwsModule } from './common/services/aws/aws.module';
 import { RedisModule } from './common/services/redis/redis.module';
 import { UsersModule } from './modules/users/users.module';
+import { WorkspacesModule } from './modules/workspaces/workspaces.module';
+import { TasksModule } from './modules/tasks/tasks.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { UsersModule } from './modules/users/users.module';
     DatabaseModule,
     AwsModule,
     RedisModule,
+    WorkspacesModule,
+    TasksModule,
   ],
   controllers: [],
   providers: [

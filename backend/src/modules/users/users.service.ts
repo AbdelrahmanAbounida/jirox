@@ -40,7 +40,7 @@ export class UsersService {
     return users;
   }
 
-  async findUserById(id: number) {
+  async findUserById(id: string) {
     const user = await this.userRepository.findOneBy({ id });
     return user;
   }
@@ -50,7 +50,7 @@ export class UsersService {
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.findUserById(id);
     const updatedUser = Object.assign(user, updateUserDto);
     await this.entiyManager.save(updatedUser);
@@ -58,7 +58,7 @@ export class UsersService {
     return updatedUser;
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const user = await this.findUserById(id);
     await this.entiyManager.remove(user);
     return { message: 'User has been deleted successfully' };

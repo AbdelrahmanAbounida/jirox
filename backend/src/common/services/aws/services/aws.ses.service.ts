@@ -44,12 +44,10 @@ export class AwsSesService {
   constructor(private readonly configService: ConfigService) {
     this.sesClient = new SESClient({
       credentials: {
-        accessKeyId: this.configService.get('aws.ses_smtp_access_key'),
-        secretAccessKey: this.configService.get(
-          'aws.ses_smtp_seret_access_key',
-        ),
+        accessKeyId: this.configService.get('aws.access_key'),
+        secretAccessKey: this.configService.get('aws.secret_access_key'),
       },
-      region: this.configService.get('aws.region'),
+      region: this.configService.get('aws.ses_region'),
     });
   }
 
