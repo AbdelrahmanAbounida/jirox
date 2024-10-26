@@ -9,6 +9,8 @@ import {
 } from 'typeorm';
 import { USER_ROLE_ENUM } from '../enums/role.enum';
 import { Exclude, Expose } from 'class-transformer';
+import { WorkspaceEntity } from 'src/modules/workspaces/entities/workspace.entity';
+import { NotificationEntity } from 'src/modules/notifications/entities/notification.entity';
 
 @Entity()
 export class User extends AbstractEnttiy<User> {
@@ -46,6 +48,12 @@ export class User extends AbstractEnttiy<User> {
 
   @OneToMany(() => Session, (session) => session.user, { cascade: true })
   sessions: Session[];
+
+  @OneToMany(() => WorkspaceEntity, (workspace) => workspace.owner)
+  workspaces: WorkspaceEntity[];
+
+  @OneToMany(() => NotificationEntity, (notification) => notification.user)
+  notifications: NotificationEntity[];
 
   // relations
   // @ManyToOne(()=>Post,post=>post.owner)

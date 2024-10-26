@@ -3,11 +3,11 @@ import { User } from 'src/modules/users/entities/user.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
 @Entity()
-export class WorkspaceEntity extends AbstractEnttiy<WorkspaceEntity> {
+export class NotificationEntity extends AbstractEnttiy<NotificationEntity> {
   @Column({ type: 'nvarchar', length: 50, nullable: false, unique: true })
-  name: string;
+  content: string;
 
-  @ManyToOne(() => User, (user) => user.workspaces, { cascade: true })
-  @JoinColumn({ name: 'ownerId' })
-  owner: User;
+  @ManyToOne(() => User, (user) => user.notifications, { cascade: true })
+  @JoinColumn({ name: 'userId' })
+  user: User;
 }

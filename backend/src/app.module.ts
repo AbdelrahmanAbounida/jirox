@@ -14,6 +14,7 @@ import { UsersModule } from './modules/users/users.module';
 import { WorkspacesModule } from './modules/workspaces/workspaces.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { ProjectsModule } from './modules/projects/projects.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ProjectsModule } from './modules/projects/projects.module';
     WorkspacesModule,
     TasksModule,
     ProjectsModule,
+    NotificationsModule,
   ],
   controllers: [],
   providers: [
