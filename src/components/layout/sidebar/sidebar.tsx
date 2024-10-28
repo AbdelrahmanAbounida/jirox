@@ -12,7 +12,6 @@ const Sidebar = () => {
   return (
     <aside className="w-64 bg-gray-100 fixed h-full top-0 left-0 p-3">
       <Logo className="my-3 mx-auto h-11 w-32" />
-      {/* <DottedLine /> */}
 
       {/** New Workspace */}
       <div className="flex w-full items-center justify-between border-t pt-2 mt-5">
