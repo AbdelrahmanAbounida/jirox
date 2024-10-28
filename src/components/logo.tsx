@@ -4,8 +4,8 @@ import React from "react";
 
 const Logo = ({ className }: { className?: string }) => {
   return (
-    <Link href={"/"} className={cn(className)}>
-      <img className="" src="/logo.png" width={150} height={150} />
+    <Link href={"/"} className={cn()}>
+      <img className={className} src="/logo.png" width={150} height={150} />
     </Link>
   );
 };

@@ -13,7 +13,11 @@ export const AllProviders = async ({
   return (
     <AuthProvider>
       <QueryClientProvider>
-        <ThemeProvider defaultTheme="light" attribute="class">
+        <ThemeProvider
+          forcedTheme="light"
+          defaultTheme="light"
+          attribute="class"
+        >
           <Toaster richColors />
           <ModalsProvider />
           {children}

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { AllProviders } from "@/providers";
 
 const inter = Inter({ subsets: ["latin"] });
+const mont = Montserrat({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,9 +19,9 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="en">
-      <AllProviders>
-        <body className={inter.className}>{children}</body>
-      </AllProviders>
+      <body className={inter.className}>
+        <AllProviders>{children}</AllProviders>
+      </body>
     </html>
   );
 }
