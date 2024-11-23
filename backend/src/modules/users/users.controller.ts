@@ -8,6 +8,7 @@ import {
   Delete,
   ParseIntPipe,
   NotFoundException,
+  Version,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -76,5 +77,11 @@ export class UsersController {
     }
 
     return this.usersService.remove(id);
+  }
+
+  @Get('/test')
+  @Version('2') // this is a version for specific route
+  async testVersions() {
+    return 'test';
   }
 }

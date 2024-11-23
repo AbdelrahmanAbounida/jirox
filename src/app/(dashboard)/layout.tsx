@@ -17,10 +17,10 @@ export default function DashboardLayout({
       <div className="md:pl-72   w-full">
         <div className="flex flex-col gap-1 p-2">
           <div className="w-full">
-            <NextTopLoader color="#4F46E5" speed={300} />
+            <NextTopLoader color="blue" speed={300} />
           </div>
           <Navbar />
-          <div className="p-4 flex flex-col gap-3">{children}</div>
+          <div className="p-4 flex flex-col gap-3 max-w-9xl">{children}</div>
         </div>
       </div>
     </div>

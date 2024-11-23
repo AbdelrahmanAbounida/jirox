@@ -31,7 +31,7 @@ async function createApp(expressApp?: express.Express) {
     // new LoggerInterceptor(),
     new ClassSerializerInterceptor(app.get(Reflector)),
   );
-  app.enableVersioning({ type: VersioningType.URI, prefix: 'v' });
+  app.enableVersioning({ type: VersioningType.URI }); // prefix: 'v'
   app.setGlobalPrefix('api');
   app.use(cookieParser());
 
