@@ -1,10 +1,11 @@
 import React from "react";
+import KanbanBoard from "./board";
 
 const TasksKanban = () => {
   return (
-    <div className="p-5 border  rounded-lg">
+    <div className="w-full flex flex-col  h-full  pb-5 box-border ">
       {/** TODO:: Tasks kanban */}
-      TasksKanban
+      <KanbanBoard />
     </div>
   );
 };

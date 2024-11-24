@@ -19,24 +19,17 @@ const SidebarItem = ({ title, icon, href }: SidebarItemProps) => {
       href={href}
       className={cn(
         "w-full flex items-center  text-gray-600 gap-2 group rounded-md p-2 hover:bg-gray-50",
-        isActive && "bg-white hover:bg-white"
+        isActive && "bg-white hover:bg-white text-black"
       )}
     >
       <Icon
         className={cn(
-          "text-sm text-gray-700 group-hover:text-blue-600",
-          isActive && "font-medium text-blue-600 "
+          "text-sm text-gray-700 ",
+          isActive && "font-medium text-black "
         )}
         size={16}
       />
-      <p
-        className={cn(
-          "text-sm group-hover:text-blue-600",
-          isActive && "font-medium text-blue-600 "
-        )}
-      >
-        {title}
-      </p>
+      <p className={cn("text-sm ", isActive && "font-medium  ")}>{title}</p>
     </Link>
   );
 };

@@ -14,7 +14,7 @@ import React from "react";
 // TODO:: any new create will be in a modal
 const DashboardHome = async () => {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 p-4 h-full  box-border">
       {/** List of cards */}
       <DashCards />
 
@@ -39,7 +39,7 @@ const DashboardHome = async () => {
       {/**
        * People List
        */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 pb-9">
         <div className="flex-1 ">
           <PeopleCard />
         </div>

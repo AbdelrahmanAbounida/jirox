@@ -1,8 +1,8 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TasksCalendar from "./tasks-calendar";
-import TasksKanban from "./tasks-kanban";
-import TasksTable from "./tasks-table";
+import TasksKanban from "./tasks-kanban/tasks-kanban";
+import TasksTable from "./tasks-table/tasks-table";
 
 const TasksTabs = () => {
   return (

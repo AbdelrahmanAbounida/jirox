@@ -19,7 +19,7 @@ const ProjectsCard = () => {
           <Button
             size={"icon"}
             variant={"ghost"}
-            className="shadow-sm w-8 h-8 border rounded-md"
+            className="shadow-sm w-8 h-8  rounded-md"
           >
             <GearIcon className="" />
           </Button>
@@ -40,7 +40,7 @@ const ProjectsCard = () => {
 export default ProjectsCard;
 
 const PersonCard = ({ name, email }: { name: string; email: string }) => (
-  <div className="border min-w-[210px] rounded-lg p-3 flex flex-col justify-center items-center">
+  <div className=" min-w-[210px] rounded-lg p-3 flex flex-col justify-center items-center">
     <div className="bg-gray-200/80 flex items-center justify-center font-semibold rounded-full w-11 h-11">
       <span className="capitalize ">{name && name[0]}</span>
     </div>

@@ -8,20 +8,19 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex items-start w-full  h-full">
-      {/**sidebar */}
+    <div className="flex items-start w-full h-screen">
+      {/** Sidebar */}
       <div className="hidden md:flex">
         <Sidebar />
       </div>
 
-      <div className="md:pl-72   w-full">
-        <div className="flex flex-col gap-1 p-2">
-          <div className="w-full">
-            <NextTopLoader color="blue" speed={300} />
-          </div>
-          <Navbar />
-          <div className="p-4 flex flex-col gap-3 max-w-9xl">{children}</div>
+      {/** Main Content */}
+      <div className="flex flex-col w-full h-full md:pl-72 p-3 box-border">
+        <div className="w-full">
+          <NextTopLoader color="blue" speed={300} />
         </div>
+        <Navbar />
+        <div className="w-full flex-grow ">{children}</div>
       </div>
     </div>
   );
