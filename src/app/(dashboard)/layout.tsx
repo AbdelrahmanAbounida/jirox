@@ -19,8 +19,12 @@ export default function DashboardLayout({
         <div className="w-full">
           <NextTopLoader color="blue" speed={300} />
         </div>
-        <Navbar />
-        <div className="w-full flex-grow ">{children}</div>
+        <div className="flex-grow">
+          <Navbar />
+        </div>
+        <div className="w-full h-full flex-grow items-start justify-start">
+          {children}
+        </div>
       </div>
     </div>
   );

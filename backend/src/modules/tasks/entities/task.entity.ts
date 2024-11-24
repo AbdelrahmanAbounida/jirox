@@ -21,6 +21,7 @@ export class TaskEntity extends AbstractEnttiy<TaskEntity> {
   @JoinColumn({ name: 'assigneeId' })
   assignee: WorkspaceMemberEntity;
 
+  // @Exclude()
   @ManyToOne(() => ProjectEntity, (project) => project.tasks, { cascade: true })
   @JoinColumn({ name: 'projectId' }) // define col as projectId
   project: ProjectEntity;

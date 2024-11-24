@@ -12,8 +12,8 @@ import TasksFilters from "@/components/tasks/tasks-filters";
 
 const Tasks = () => {
   return (
-    <div className="border rounded-lg h-full flex flex-col">
-      <Tabs defaultValue="table" className="flex flex-col flex-grow">
+    <div className="border rounded-lg flex flex-col h-full">
+      <Tabs defaultValue="table" className="flex flex-col flex-grow h-full">
         {/** Header */}
         <div className="flex items-center justify-between p-3">
           <TabsList className="w-[230px]">
@@ -33,22 +33,20 @@ const Tasks = () => {
         <Separator />
 
         {/** Filters */}
-        <div className=" pt-4 w-full px-3">
+        <div className=" pt-4 w-full px-3 mb-5">
           <TasksFilters />
         </div>
 
         {/** Tabs Content */}
-        <div className="flex-grow overflow-y-hidden">
-          <TabsContent value="table" className="w-full h-full mt-6">
-            <TasksTable />
-          </TabsContent>
-          <TabsContent value="kanban" className="w-full h-full  mt-6">
-            <TasksKanban />
-          </TabsContent>
-          <TabsContent value="calendar" className="w-full h-full mt-6">
-            <TasksCalendar />
-          </TabsContent>
-        </div>
+        <TabsContent value="table" className="w-full h-full">
+          <TasksTable />
+        </TabsContent>
+        <TabsContent value="kanban" className="w-full h-full  ">
+          <TasksKanban />
+        </TabsContent>
+        <TabsContent value="calendar" className="w-full h-full">
+          <TasksCalendar />
+        </TabsContent>
       </Tabs>
     </div>
   );
