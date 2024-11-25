@@ -6,9 +6,9 @@ import React from "react";
 
 const Members = () => {
   return (
-    <div className="w-full h-full bg-gray-50 flex items-start justify-center">
+    <div className="w-full h-full bg-gray-100 flex items-start justify-center rounded-md">
       <div className="mt-10 ">
-        <div className="w-auto min-w-[550px] bg-white rounded-md p-3">
+        <div className="w-auto min-w-[550px] bg-white rounded-md shadow-md p-5">
           <div className="flex items-center  gap-3 w-full">
             <Button
               variant={"outline"}

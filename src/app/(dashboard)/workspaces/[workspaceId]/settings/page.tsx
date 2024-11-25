@@ -1,7 +1,7 @@
 import React from "react";
 
 const WorkspaceSettings = () => {
-  return <div>WorkspaceSettings</div>;
+  return <div>{/** TODO:: Workspace Settings */}</div>;
 };
 
 export default WorkspaceSettings;
