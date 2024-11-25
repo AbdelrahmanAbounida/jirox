@@ -2,8 +2,6 @@ import MainButton from "@/components/main-btn";
 import TasksCalendar from "@/components/tasks/tasks-calendar";
 import TasksKanban from "@/components/tasks/tasks-kanban/tasks-kanban";
 import TasksTable from "@/components/tasks/tasks-table/tasks-table";
-import TasksTabs from "@/components/tasks/tasks-tabs";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { PlusIcon } from "lucide-react";
 import React from "react";
