@@ -8,6 +8,9 @@ import WorkspacesSwitcher from "./workspaces-switcher";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import ProjectTitle from "@/components/tasks/project-title";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import ProjectsList from "./projects-list";
 
 const Sidebar = () => {
   return (
@@ -44,17 +47,7 @@ const Sidebar = () => {
       </div>
 
       {/** TODO:: add list of projects */}
-      <div className=" flex flex-col gap-2 items-start ">
-        {[1, 2].map((item, index) => (
-          <div className="my-3 cursor-pointer">
-            <ProjectTitle
-              title="Mobile App Development"
-              className="text-gray-600"
-              key={index}
-            />
-          </div>
-        ))}
-      </div>
+      <ProjectsList />
     </aside>
   );
 };

@@ -1,7 +1,6 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 import { Avatar } from "../ui/avatar";
-
 const ProjectTitle = ({
   title,
   className,
@@ -16,10 +15,10 @@ const ProjectTitle = ({
         className
       )}
     >
-      <Avatar className="rounded-md uppercase bg-blue-600 text-white flex items-center justify-center h-6 w-6">
+      <Avatar className="rounded-md uppercase bg-blue-600 text-white flex items-center justify-center h-6 w-6 ">
         {title && title[0]}
       </Avatar>
-      <p className="">{title}</p>
+      <p className="truncate overflow-hidden">{title}</p>
     </div>
   );
 };

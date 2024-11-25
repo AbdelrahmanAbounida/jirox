@@ -14,7 +14,7 @@ export interface InfoCardProps {
   title: string;
   value: number;
   incrementValue: number; // positive or negative
-  icon: ReactNode; //IconType | typeof Icon;
+  icon?: ReactNode; //IconType | typeof Icon;
 }
 
 const InfoCard = ({

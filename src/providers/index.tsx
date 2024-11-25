@@ -20,7 +20,7 @@ export const AllProviders = async ({
         >
           <Toaster richColors />
           <ModalsProvider />
-          {children}
+          <div className="h-screen">{children}</div>
         </ThemeProvider>
       </QueryClientProvider>
     </AuthProvider>
