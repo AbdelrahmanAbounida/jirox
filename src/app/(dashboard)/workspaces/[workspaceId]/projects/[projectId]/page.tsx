@@ -1,9 +1,7 @@
 "use client";
 import InfoCard from "@/components/home/info-card";
-import RecentTasksCard from "@/components/home/recent-tasks-card";
 import MyTasks from "@/components/my-tasks";
 import ProjectTitle from "@/components/tasks/project-title";
-import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

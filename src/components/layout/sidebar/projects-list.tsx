@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
-const ProjectsList = () => {
+const ProjectsList = ({ workspaceId }: { workspaceId: string }) => {
   const currentPath = usePathname();
 
   return (
@@ -12,7 +12,7 @@ const ProjectsList = () => {
       <div className=" flex flex-col gap-1 items-start mt-2 ">
         {[1, 2].map((item, index) => (
           <Link
-            href={"/projects/" + item}
+            href={`/workspaces/${workspaceId}` + "/projects/" + item}
             className="my-1 cursor-pointer w-full hover:bg-gray-50"
           >
             <ProjectTitle

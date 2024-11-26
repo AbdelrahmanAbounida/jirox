@@ -4,14 +4,18 @@ import NextTopLoader from "nextjs-toploader";
 
 export default function DashboardLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: {
+    workspaceId: string;
+  };
 }) {
   return (
     <div className="flex items-start w-full h-screen">
       {/** Sidebar */}
       <div className="hidden md:flex">
-        <Sidebar />
+        <Sidebar workspaceId={params.workspaceId} />
       </div>
 
       {/** Main Content */}
@@ -22,6 +26,7 @@ export default function DashboardLayout({
         <div className="flex-grow">
           <Navbar />
         </div>
+        <div>{params.workspaceId}</div>
         <div className="w-full h-full flex-grow items-start justify-start">
           {children}
         </div>

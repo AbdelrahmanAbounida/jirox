@@ -8,6 +8,7 @@ import { PlusIcon } from "lucide-react";
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TasksFilters from "@/components/tasks/tasks-filters";
+import NewTaskmodal from "./modals/new-task-modal";
 
 const MyTasks = ({ projectId }: { projectId?: string }) => {
   return (
@@ -22,10 +23,7 @@ const MyTasks = ({ projectId }: { projectId?: string }) => {
           </TabsList>
 
           {/** New Task Button */}
-          <MainButton>
-            <PlusIcon className="text-white" />
-            New
-          </MainButton>
+          <NewTaskmodal />
         </div>
 
         {/** Separator */}

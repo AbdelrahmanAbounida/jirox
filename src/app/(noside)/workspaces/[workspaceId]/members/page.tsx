@@ -1,16 +1,22 @@
+"use client";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ChevronLeft, Ellipsis, EllipsisVertical } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const Members = () => {
+  const router = useRouter();
   return (
     <div className="w-full h-full bg-gray-100 flex items-start justify-center rounded-md">
       <div className="mt-10 ">
         <div className="w-auto min-w-[550px] bg-white rounded-md shadow-md p-5">
           <div className="flex items-center  gap-3 w-full">
             <Button
+              onClick={() => {
+                router.back();
+              }}
               variant={"outline"}
               className="h-7 flex items-center  gap-2"
             >

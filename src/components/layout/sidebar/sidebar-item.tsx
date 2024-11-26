@@ -13,7 +13,7 @@ export interface SidebarItemProps {
 const SidebarItem = ({ title, icon, href }: SidebarItemProps) => {
   const currentPath = usePathname();
   const Icon = icon;
-  const isActive = currentPath == href;
+  const isActive = currentPath.includes(href);
   return (
     <Link
       href={href}
