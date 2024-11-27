@@ -1,5 +1,3 @@
-"use server";
-
 import apiClient from "@/lib/api-client";
 
 // TODO:: pass the task items

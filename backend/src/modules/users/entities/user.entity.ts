@@ -1,26 +1,28 @@
 import { AbstractEnttiy } from 'src/database/abstract.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   OneToMany,
   Unique,
+  UpdateDateColumn,
 } from 'typeorm';
 import { USER_ROLE_ENUM } from '../enums/role.enum';
 import { Exclude, Expose } from 'class-transformer';
 import { WorkspaceEntity } from 'src/modules/workspaces/entities/workspace.entity';
 import { NotificationEntity } from 'src/modules/notifications/entities/notification.entity';
 
-@Entity()
+@Entity('User')
 export class User extends AbstractEnttiy<User> {
-  @Column({ type: 'nvarchar', length: 50, nullable: true })
+  @Column()
   name: string;
 
-  @Column({ type: 'mediumtext', nullable: true })
+  @Column() // { type: 'mediumtext', nullable: true }
   image: string;
 
-  @Column({ type: 'nvarchar', unique: true }) // ,unique:true,
+  @Column() // , unique: true >> No need as we apply it from prisma
   email: string;
 
   @Column()
@@ -28,10 +30,10 @@ export class User extends AbstractEnttiy<User> {
   @Expose({ name: 'hashedpassword' })
   password: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' }) // ,default:new Date()
-  created_at: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @UpdateDateColumn()
   updated_at: Date;
 
   @Column({ type: 'timestamp', nullable: true })
@@ -54,18 +56,10 @@ export class User extends AbstractEnttiy<User> {
 
   @OneToMany(() => NotificationEntity, (notification) => notification.user)
   notifications: NotificationEntity[];
-
-  // relations
-  // @ManyToOne(()=>Post,post=>post.owner)
-  // posts: Post[]
-
-  // @ManyToMany(()=> Post, post=>post.users)
-  // @JoinTable()
-  // savedPosts: Post[]
 }
 
-@Entity()
-@Unique(['provider', 'providerAccountId'])
+@Entity('Account')
+// @Unique(['provider', 'providerAccountId']) // No need as we apply it from prisma
 export class Account extends AbstractEnttiy<Account> {
   @Column()
   userId: string;
@@ -105,7 +99,7 @@ export class Account extends AbstractEnttiy<Account> {
   user: User;
 }
 
-@Entity()
+@Entity('Session')
 export class Session extends AbstractEnttiy<Session> {
   @Column()
   sessionToken: string;
@@ -121,8 +115,8 @@ export class Session extends AbstractEnttiy<Session> {
   user: User;
 }
 
-@Entity()
-@Unique(['identifier', 'token'])
+@Entity('VerificationToken')
+// @Unique(['identifier', 'token']) // No need as we apply it from prisma
 export class VerificationToken extends AbstractEnttiy<VerificationToken> {
   @Column()
   identifier: string;

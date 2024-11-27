@@ -15,6 +15,7 @@ import { WorkspacesModule } from './modules/workspaces/workspaces.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import awsConfig from './config/aws.config';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
       isGlobal: true,
       cache: true,
       envFilePath: '.env', // ::TODO:: Load different one for testing
-      load: [databaseConfig, appConfig, authConfig], // awsConfig
+      load: [databaseConfig, appConfig, authConfig, awsConfig], // awsConfig
     }),
     // 2- Database
     DatabaseModule,

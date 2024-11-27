@@ -22,37 +22,37 @@ export class AwsS3Service {
 
   async uploadFile({
     file,
-    workspaceId,
+    userId,
   }: {
     file: Express.Multer.File;
-    workspaceId: string;
+    userId: string;
   }): Promise<string> {
     const params = {
       Bucket: this.configService.get('aws.s3_bucket_name'),
-      Key: `logos/${workspaceId}/${file.originalname}`, // Include original file name
+      Key: `logos/${userId}/${file.originalname}`,
       Body: file.buffer,
     };
-
     try {
-      const command = new PutObjectCommand(params); // Create command for the upload
-      await this.s3Client.send(command); // Send the command to S3
+      const command = new PutObjectCommand(params);
+      await this.s3Client.send(command);
 
-      return `https://${this.configService.get('aws.s3_bucket_name')}.s3.${this.configService.get('aws.s3_region')}.amazonaws.com/logos/${workspaceId}/${file.originalname}`;
+      return `https://${this.configService.get('aws.s3_bucket_name')}.s3.${this.configService.get('aws.s3_region')}.amazonaws.com/logos/${userId}/${file.originalname}`;
     } catch (error) {
+      console.log({ S3Error: error });
       throw new Error(`Error uploading file: ${error.message}`);
     }
   }
 
   async replaceFile({
     newFile,
-    workspaceId,
+    userId,
   }: {
     newFile: Express.Multer.File;
-    workspaceId: string;
+    userId: string;
   }): Promise<string> {
     const params = {
       Bucket: this.configService.get('aws.s3_bucket_name'),
-      Key: `logos/${workspaceId}/${newFile.originalname}`, // Ensure the same key for replacement
+      Key: `logos/${userId}/${newFile.originalname}`, // Ensure the same key for replacement
       Body: newFile.buffer,
     };
 
@@ -60,22 +60,22 @@ export class AwsS3Service {
       const command = new PutObjectCommand(params); // Create command for replacement
       await this.s3Client.send(command);
 
-      return `https://${this.configService.get('aws.s3_bucket_name')}.s3.${this.configService.get('aws.s3_region')}.amazonaws.com/logos/${workspaceId}/${newFile.originalname}`;
+      return `https://${this.configService.get('aws.s3_bucket_name')}.s3.${this.configService.get('aws.s3_region')}.amazonaws.com/logos/${userId}/${newFile.originalname}`;
     } catch (error) {
       throw new Error(`Error replacing file: ${error.message}`);
     }
   }
 
   async deleteFile({
-    workspaceId,
+    userId,
     fileName,
   }: {
-    workspaceId: string;
+    userId: string;
     fileName: string; // Specify the file name to delete
   }): Promise<void> {
     const params = {
       Bucket: this.configService.get('aws.s3_bucket_name'),
-      Key: `logos/${workspaceId}/${fileName}`, // Use workspaceId and file name for deletion
+      Key: `logos/${userId}/${fileName}`, // Use userId and file name for deletion
     };
 
     try {

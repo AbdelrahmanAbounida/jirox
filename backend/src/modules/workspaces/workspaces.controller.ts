@@ -18,8 +18,10 @@ import {
 import { WorkspacesService } from './workspaces.service';
 import { CreateWorkspaceDto } from './dto/create-workspace.dto';
 import { UpdateWorkspaceDto } from './dto/update-workspace.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CurrentUser } from '../auth/decorator/current-user.decorator';
+import { User } from '../users/entities/user.entity';
 
 @Controller({
   version: '1',
@@ -29,12 +31,24 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class WorkspacesController {
   constructor(private readonly workspacesService: WorkspacesService) {}
 
-  @Post()
-  @UseInterceptors(FileInterceptor('logo')) // extract file from field logo
+  @Post('/create')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        logo: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(FileInterceptor('logo'))
   create(
     @Body() createWorkspaceDto: CreateWorkspaceDto,
     @UploadedFile(
-      new ParseFilePipeBuilder() // validate file
+      new ParseFilePipeBuilder()
         .addFileTypeValidator({
           fileType: /^(image\/jpeg|image\/png|image\/svg\+xml)$/,
         })
@@ -46,11 +60,13 @@ export class WorkspacesController {
         }),
     )
     logo: Express.Multer.File,
+    @CurrentUser() user: User,
   ) {
     if (!logo) {
       throw new BadRequestException('Logo is required');
     }
-    return this.workspacesService.create(createWorkspaceDto, logo);
+    // console.log('Create WS');
+    return this.workspacesService.create(createWorkspaceDto, logo, user);
   }
 
   @Get('/all')
@@ -67,6 +83,7 @@ export class WorkspacesController {
   @UseInterceptors(FileInterceptor('logo'))
   update(
     @Param('id') id: string,
+    @CurrentUser() user: User,
     @Body() updateWorkspaceDto: UpdateWorkspaceDto,
     @UploadedFile(
       new ParseFilePipeBuilder()
@@ -82,7 +99,7 @@ export class WorkspacesController {
     )
     logo?: Express.Multer.File,
   ) {
-    return this.workspacesService.update(id, updateWorkspaceDto, logo);
+    return this.workspacesService.update(id, updateWorkspaceDto, logo, user);
   }
 
   @Delete(':id')

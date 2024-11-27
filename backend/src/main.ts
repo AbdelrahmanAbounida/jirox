@@ -13,6 +13,7 @@ import express from 'express';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import * as dotenv from 'dotenv';
 import { writeFileSync } from 'fs';
+import * as bodyParser from 'body-parser';
 
 dotenv.config();
 
@@ -34,6 +35,10 @@ async function createApp(expressApp?: express.Express) {
   app.enableVersioning({ type: VersioningType.URI }); // prefix: 'v'
   app.setGlobalPrefix('api');
   app.use(cookieParser());
+
+  // by default nest limit payload size to 100k
+  app.use(bodyParser.json({ limit: '50mb' }));
+  app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
   console.log('App configuration complete');
 

@@ -1,13 +1,13 @@
-"use server";
 import apiClient from "@/lib/api-client";
+import { Workspace } from "@/types/workspace";
 
 export const getAllWorkspaces = async () => {
-  const allTasks = await apiClient({
+  const allWorkspaces: Workspace[] = await apiClient({
     endpoint: "/workspaces/all",
     method: "GET",
   });
 
-  return allTasks;
+  return allWorkspaces;
 };
 
 export const getWorkspace = async ({

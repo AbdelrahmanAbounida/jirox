@@ -26,7 +26,7 @@ const Sidebar = ({ workspaceId }: { workspaceId: string }) => {
         </NewWorkspaceModal>
       </div>
       <div className="border-b my-1  pb-3">
-        <WorkspacesSwitcher />
+        <WorkspacesSwitcher workspaceId={workspaceId} />
       </div>
       {/* <DottedLine /> */}
 

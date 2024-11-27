@@ -3,7 +3,7 @@ import { Column, Entity, OneToMany, Unique } from 'typeorm';
 import { WORKSPACE_MEMBER_ROLE } from '../enums/member.enum';
 import { TaskEntity } from 'src/modules/tasks/entities/task.entity';
 
-@Entity()
+@Entity('members')
 @Unique(['userEmail', 'workspaceId'])
 export class WorkspaceMemberEntity extends AbstractEnttiy<WorkspaceMemberEntity> {
   @Column({ type: 'text' })

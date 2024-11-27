@@ -2,7 +2,7 @@ import { AbstractEnttiy } from 'src/database/abstract.entity';
 import { User } from 'src/modules/users/entities/user.entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 
-@Entity()
+@Entity('notifications')
 export class NotificationEntity extends AbstractEnttiy<NotificationEntity> {
   @Column({ type: 'nvarchar', length: 50, nullable: false, unique: true })
   content: string;
