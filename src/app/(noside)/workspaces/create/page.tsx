@@ -20,7 +20,6 @@ import MainButton from "@/components/main-btn";
 import { createWorkspaceSchema } from "@/schemas/ws-form-schema";
 import { toast } from "sonner";
 import { createWorkspace } from "@/services/workspaces/create-workspace";
-import apiClient from "@/lib/api-client";
 import { useWorkspaces } from "@/hooks/workspaces/useWorkspaces";
 
 const CreateFirstWorkspacePage = () => {

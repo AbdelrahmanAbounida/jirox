@@ -15,9 +15,10 @@ export const getWorkspace = async ({
 }: {
   workspaceId: string;
 }) => {
-  const workspace = await apiClient({
-    endpoint: `/workspace/${workspaceId}`,
+  const workspace: Workspace = await apiClient({
+    endpoint: `/workspaces/${workspaceId}`,
     method: "GET",
   });
+  console.log({ workspace });
   return workspace;
 };

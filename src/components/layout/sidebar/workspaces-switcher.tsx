@@ -39,14 +39,14 @@ function WorkspacesSwitcher({ workspaceId }: { workspaceId?: string }) {
     }
   }, [isLoading, allWorkspaces]);
 
+  const ws = allWorkspaces?.find((workspace) => workspace.id === value);
+
   if (isLoading) {
     return <Skeleton className="w-[100px] h-[20px] rounded-full" />;
   }
-  const ws = allWorkspaces?.find((workspace) => workspace.id === value);
-
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+      <PopoverTrigger disabled={isLoading} asChild>
         <Button
           variant="outline"
           role="combobox"
@@ -70,7 +70,11 @@ function WorkspacesSwitcher({ workspaceId }: { workspaceId?: string }) {
           <CommandInput className="w-full" placeholder="Search workspace..." />
           <CommandList>
             <CommandEmpty>No workspaces found.</CommandEmpty>
-            <CommandGroup className="w-full ">
+            <CommandGroup
+              defaultValue={ws?.id}
+              defaultChecked
+              className="w-full "
+            >
               {allWorkspaces?.map((workspace) => (
                 <CommandItem
                   className="w-full items-center justify-start flex"

@@ -29,7 +29,6 @@ const apiClient = async ({
     ...headers,
     Authorization: `Bearer ${accessToken}`,
   };
-  console.log({ mainHeaders });
 
   const response = await fetch(`${API_URL}${endpoint}`, {
     method,

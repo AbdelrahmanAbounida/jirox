@@ -17,15 +17,17 @@ const ConfirmDeleteModal = ({
   onDelete,
   title,
   description,
+  deleteButtonTitle,
 }: {
   children?: React.ReactNode;
-  onDelete: Function;
+  onDelete: any;
   title?: string;
   description?: string;
+  deleteButtonTitle?: string;
 }) => {
   return (
     <AlertDialog>
-      <AlertDialogTrigger>Delete</AlertDialogTrigger>
+      <AlertDialogTrigger>{children}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
@@ -38,8 +40,13 @@ const ConfirmDeleteModal = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogCancel className="h-8">Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            className="bg-red-600/90 h-8 hover:bg-red-600 hover:opacity-95"
+            onClick={onDelete}
+          >
+            {deleteButtonTitle || title || "Delete"}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

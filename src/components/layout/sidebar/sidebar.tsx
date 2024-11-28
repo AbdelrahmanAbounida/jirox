@@ -43,7 +43,7 @@ const Sidebar = ({ workspaceId }: { workspaceId: string }) => {
       <div className="flex w-full items-center justify-between border-t pt-2 mt-5">
         <p className="text-gray-500 uppercase text-xs">Projects</p>
 
-        <NewProjectModal>
+        <NewProjectModal workspaceId={workspaceId}>
           <Button variant={"ghost"} size={"icon"}>
             <PlusCircle size={22} />
           </Button>

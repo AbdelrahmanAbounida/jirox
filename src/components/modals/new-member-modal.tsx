@@ -30,14 +30,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createProjectSchema } from "@/schemas/project-form-schema";
-import { ProjectColor } from "@/schemas/enums";
-import { createNewProject } from "@/services/projects/create-project";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { mutate } from "swr";
+import { addMemberSchema } from "@/schemas/members-schema";
+import { inviteNewMember } from "@/services/members/invite-member";
+import { WORKSPACE_MEMBER_ROLE } from "@/constants/enums";
 
-const NewProjectModal = ({
+const NewMemberModal = ({
   children,
   workspaceId,
 }: {
@@ -48,16 +48,16 @@ const NewProjectModal = ({
   const [open, setopen] = useState(false);
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof createProjectSchema>>({
-    resolver: zodResolver(createProjectSchema),
+  const form = useForm<z.infer<typeof addMemberSchema>>({
+    resolver: zodResolver(addMemberSchema),
     defaultValues: {},
   });
-  async function onSubmit(values: z.infer<typeof createProjectSchema>) {
+  async function onSubmit(values: z.infer<typeof addMemberSchema>) {
     setcreateLoading(true);
     try {
-      const resp = await createNewProject({
-        name: values.name,
-        color: values.color,
+      const resp = await inviteNewMember({
+        email: values.email,
+        role: values.role,
         workspaceId: workspaceId!,
       });
 
@@ -65,19 +65,17 @@ const NewProjectModal = ({
         toast.error(resp?.message);
       } else {
         if (!resp || !resp?.id) {
-          toast.error("Something went wrong while creating new Project");
+          toast.error("Something went wrong while inviting new member");
           return;
         }
-        toast.success("Project Created Successfully");
+        toast.success("Invitation sent Successfully");
         // close the model
         setopen(false);
-        // mutate loading projects
-        mutate(["projects", workspaceId]);
-        router.push(`/workspaces/${workspaceId}/projects/${resp?.id}`);
+        mutate([workspaceId, "members"]);
       }
     } catch (error) {
       console.log({ error });
-      toast.error("Failed to create Project");
+      toast.error("Failed to invite member");
     } finally {
       setcreateLoading(false);
     }
@@ -95,18 +93,17 @@ const NewProjectModal = ({
       </DialogTrigger>
 
       <DialogContent>
-        <DialogTitle>Create New Project</DialogTitle>
+        <DialogTitle>Add New Member</DialogTitle>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-            {/** 1- Project Name */}
             <FormField
               control={form.control}
-              name="name"
+              name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Project Name</FormLabel>
+                  <FormLabel>Email Address</FormLabel>
                   <FormControl>
-                    <Input placeholder="Do homework" {...field} />
+                    <Input placeholder="asd@gmail.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -116,10 +113,10 @@ const NewProjectModal = ({
             {/** 2- color */}
             <FormField
               control={form.control}
-              name="color"
+              name="role"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Color</FormLabel>
+                  <FormLabel>Role</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
@@ -131,40 +128,21 @@ const NewProjectModal = ({
                     </FormControl>
 
                     <SelectContent>
-                      {Object.entries(ProjectColor).map(([key, val], index) => (
-                        <SelectItem key={index} value={val.toString()}>
-                          <div className="flex items-center gap-2">
-                            <div
-                              style={{ backgroundColor: val }}
-                              className={cn("rounded-full w-3 h-3")}
-                            />
-                            {key}
-                          </div>
-                        </SelectItem>
-                      ))}
+                      {Object.entries(WORKSPACE_MEMBER_ROLE).map(
+                        ([key, val], index) => (
+                          <SelectItem key={index} value={val.toString()}>
+                            <div className="flex items-center gap-2 lowercase ">
+                              {val}
+                            </div>
+                          </SelectItem>
+                        )
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {/** project Icon */}
-            {/* <div className="flex items-start gap-3 my-3 ">
-              <Avatar className="bg-gray-100 flex items-center justify-center rounded-full p-2 w-20 h-20">
-                <Image className="h-9 w-9 text-gray-400" />
-              </Avatar>
-
-              <div className="flex flex-col items-start gap-1 flex-1 w-full ">
-                <p className="text-sm">Project Icon</p>
-                <p className="text-gray-400 text-sm">
-                  400px, JPG or PNG, max 2000kb
-                </p>
-                <Button className="bg-blue-100 hover:bg-blue-200 text-blue-500 font-medium h-7 mt-2">
-                  Upload Image
-                </Button>
-              </div>
-            </div> */}
 
             <div className="flex w-full items-center justify-between pt-5">
               <DialogClose asChild>
@@ -178,7 +156,7 @@ const NewProjectModal = ({
                   <Loader className="animate-spin w-4 h-4" /> Loading
                 </MainButton>
               ) : (
-                <MainButton type="submit">Create Project</MainButton>
+                <MainButton type="submit">Invite Member</MainButton>
               )}
             </div>
           </form>
@@ -188,4 +166,4 @@ const NewProjectModal = ({
   );
 };
 
-export default NewProjectModal;
+export default NewMemberModal;
