@@ -101,8 +101,6 @@ export class WorkspacesController {
           });
 
         await fileValidator.transform(logo);
-
-        console.log('File received:', logo);
       } catch (error) {
         throw new BadRequestException('File validation failed.');
       }
@@ -112,6 +110,8 @@ export class WorkspacesController {
 
   @Delete(':id')
   async remove(@Param('id') id: string, @CurrentUser() user: CurrentUserProps) {
-    return this.workspacesService.remove(id, user);
+    const deletedWorkspace = await this.workspacesService.remove(id, user);
+    console.log({ deletedWorkspace });
+    return deletedWorkspace;
   }
 }

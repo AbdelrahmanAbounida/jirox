@@ -45,18 +45,26 @@ export class AwsS3Service {
 
   async replaceFile({
     newFile,
+    oldFileName,
     userId,
   }: {
     newFile: Express.Multer.File;
+    oldFileName: string;
     userId: string;
   }): Promise<string> {
     const params = {
       Bucket: this.configService.get('aws.s3_bucket_name'),
-      Key: `logos/${userId}/${newFile.originalname}`, // Ensure the same key for replacement
+      Key: `logos/${userId}/${newFile.originalname}`,
       Body: newFile.buffer,
     };
 
     try {
+      // 1- delete old file
+      if (oldFileName) {
+        console.log({ oldFileName });
+        await this.deleteFile({ userId, fileName: oldFileName });
+      }
+      // 2- upload new one
       const command = new PutObjectCommand(params); // Create command for replacement
       await this.s3Client.send(command);
 

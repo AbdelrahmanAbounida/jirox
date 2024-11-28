@@ -156,10 +156,13 @@ export class WorkspacesService {
 
         // update logo
         if (logo) {
-          await this.s3Service.replaceFile({
+          const oldFileName = workspace.logo.split('/').pop();
+          const newLogo = await this.s3Service.replaceFile({
             newFile: logo,
             userId: user.userId,
+            oldFileName,
           });
+          workspace.logo = newLogo;
         }
 
         // update name
@@ -184,27 +187,31 @@ export class WorkspacesService {
   }
 
   async remove(id: string, user: CurrentUserProps) {
-    await this.entityManager.transaction(async (transactionalEntityManager) => {
-      const workspace = await this.findOne(id);
+    return await this.entityManager.transaction(
+      async (transactionalEntityManager) => {
+        const workspace = await this.findOne(id);
 
-      if (!workspace) {
-        throw new NotFoundException(`Workspace with id ${id} not exist`);
-      }
+        if (!workspace) {
+          throw new NotFoundException(`Workspace with id ${id} not exist`);
+        }
 
-      // check user role
-      const membership = await this.memberRepository.findOneBy({
-        workspaceId: id,
-        userId: user.userId,
-      });
+        // check user role
+        const membership = await this.memberRepository.findOneBy({
+          workspaceId: id,
+          userId: user.userId,
+        });
 
-      if (!membership || membership.role !== WORKSPACE_MEMBER_ROLE.OWNER) {
-        throw new ForbiddenException(
-          'You dont have permission to delete the workspace',
+        if (!membership || membership.role !== WORKSPACE_MEMBER_ROLE.OWNER) {
+          throw new ForbiddenException(
+            'You dont have permission to delete the workspace',
+          );
+        }
+
+        return await transactionalEntityManager.remove(
+          WorkspaceEntity,
+          workspace,
         );
-      }
-
-      await transactionalEntityManager.remove(WorkspaceEntity, workspace);
-      return { message: `Workspace with ID ${id} successfully deleted` };
-    });
+      },
+    );
   }
 }

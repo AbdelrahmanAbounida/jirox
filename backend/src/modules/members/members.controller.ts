@@ -35,7 +35,7 @@ export class MembersController {
   }
 
   @Get('/all/:workspaceId')
-  @ApiOperation({ summary: 'Get all members of a workspace' }) // Description of the operation
+  @ApiOperation({ summary: 'Get all members of a workspace' })
   @ApiParam({
     name: 'workspaceId',
     description: 'The unique ID of the workspace',
@@ -65,7 +65,10 @@ export class MembersController {
   }
 
   @Delete(':id')
-  async removeMemer(@Param('id') id: string) {
-    return this.membersService.remove(id);
+  async removeMemer(
+    @Param('id') id: string,
+    @CurrentUser() user: CurrentUserProps,
+  ) {
+    return this.membersService.remove(id, user);
   }
 }

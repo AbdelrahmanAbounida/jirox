@@ -170,7 +170,7 @@ export class MembersService {
     );
   }
 
-  async remove(id: string) {
+  async remove(id: string, user: CurrentUserProps) {
     // check if member exist
     const exist = await this.memberRepository.findOneBy({
       _id: new ObjectId(id),
@@ -180,6 +180,20 @@ export class MembersService {
       throw new NotFoundException('No Member found with this id');
     }
 
+    // check role
+    const currentUserMembership = await this.memberRepository.findOneBy({
+      userId: user.userId,
+      workspaceId: exist.workspaceId,
+    });
+
+    if (!currentUserMembership) {
+      throw new NotFoundException('You are not a member in this workspace');
+    }
+    if (currentUserMembership.role !== WORKSPACE_MEMBER_ROLE.OWNER) {
+      throw new ForbiddenException(
+        'You dont have permissions to remove a member',
+      );
+    }
     return this.entityManager.transaction(async (transactionEntityManager) => {
       return await transactionEntityManager.remove(exist);
     });
