@@ -1,4 +1,4 @@
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import {
   AfterInsert,
   AfterLoad,
@@ -8,15 +8,17 @@ import {
   ObjectIdColumn,
   PrimaryColumn,
 } from 'typeorm';
+import { ObjectId } from 'mongodb';
 
 @Entity()
 export class AbstractEnttiy<T> {
   @ObjectIdColumn({ name: '_id' })
   @Exclude()
-  _id: string;
+  _id: ObjectId; // string;
 
   @PrimaryColumn()
   @ObjectIdColumn()
+  @Expose()
   id: string;
 
   constructor(entity: Partial<T>) {
@@ -28,6 +30,8 @@ export class AbstractEnttiy<T> {
   @AfterUpdate()
   @AfterRemove()
   assingIdFromObjectId() {
-    this.id = this._id.toString();
+    if (this._id) {
+      this.id = this._id.toString(); // || uuidv4();
+    }
   }
 }

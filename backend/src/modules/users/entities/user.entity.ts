@@ -13,6 +13,9 @@ import { USER_ROLE_ENUM } from '../enums/role.enum';
 import { Exclude, Expose } from 'class-transformer';
 import { WorkspaceEntity } from 'src/modules/workspaces/entities/workspace.entity';
 import { NotificationEntity } from 'src/modules/notifications/entities/notification.entity';
+import { ProjectEntity } from 'src/modules/projects/entities/project.entity';
+import { WorkspaceMemberEntity } from 'src/modules/members/entities/member.entity';
+import { forwardRef } from '@nestjs/common';
 
 @Entity('User')
 export class User extends AbstractEnttiy<User> {
@@ -54,8 +57,14 @@ export class User extends AbstractEnttiy<User> {
   @OneToMany(() => WorkspaceEntity, (workspace) => workspace.owner)
   workspaces: WorkspaceEntity[];
 
+  @OneToMany(() => ProjectEntity, (project) => project.owner)
+  projects: WorkspaceEntity[];
+
   @OneToMany(() => NotificationEntity, (notification) => notification.user)
   notifications: NotificationEntity[];
+
+  // @OneToMany(() => WorkspaceMemberEntity, (member) => member.user)
+  // memberships: WorkspaceEntity[];
 }
 
 @Entity('Account')

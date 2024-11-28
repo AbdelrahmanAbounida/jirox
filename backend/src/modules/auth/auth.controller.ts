@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { SigninAuthDTO, SignupAuthDTO } from './dto/create-auth.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from './decorator/current-user.decorator';
+import { CurrentUserProps } from 'src/common/types/current-user';
 
 // @Public()
 
@@ -19,7 +20,7 @@ export class AuthController {
   @Post('signup')
   signUp(
     // @Body() signupAuthDTO: SignupAuthDTO,
-    @CurrentUser() user: any,
+    @CurrentUser() user: CurrentUserProps,
   ) {
     // return this.authService.signup(signupAuthDTO);
     return { user };

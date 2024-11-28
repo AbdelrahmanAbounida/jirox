@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
   NotImplementedException,
@@ -12,14 +13,23 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { WorkspaceEntity } from './entities/workspace.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { AwsS3Service } from 'src/common/services/aws/services/aws.s3.service';
-import { CurrentUser } from '../auth/decorator/current-user.decorator';
 import { User } from '../users/entities/user.entity';
+import { ProjectsService } from '../projects/projects.service';
+import { WorkspaceMemberEntity } from '../members/entities/member.entity';
+import { WORKSPACE_MEMBER_ROLE } from '../members/enums/member.enum';
+import { ObjectId } from 'mongodb';
+import { CurrentUserProps } from 'src/common/types/current-user';
 
 @Injectable()
 export class WorkspacesService {
   constructor(
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
+
+    @InjectRepository(WorkspaceMemberEntity)
+    private readonly memberRepository: Repository<WorkspaceMemberEntity>,
+
+    private readonly projectService: ProjectsService,
     private readonly entityManager: EntityManager,
     private readonly s3Service: AwsS3Service,
   ) {}
@@ -32,7 +42,6 @@ export class WorkspacesService {
     userId: string;
   }) {
     try {
-      console.log({ userId });
       const storedLogo = await this.s3Service.uploadFile({
         userId,
         file: logo,
@@ -48,7 +57,7 @@ export class WorkspacesService {
   async create(
     createWorkspaceDto: CreateWorkspaceDto,
     logo: Express.Multer.File,
-    user: User,
+    user: CurrentUserProps,
   ) {
     if (!user) {
       throw new UnauthorizedException(
@@ -59,7 +68,7 @@ export class WorkspacesService {
     // check if there is a workspace with this name
     const exist = await this.workspaceRepository.findOneBy({
       name: createWorkspaceDto.name,
-      ownerId: user.id,
+      ownerId: user.userId,
     });
 
     if (exist) {
@@ -68,24 +77,49 @@ export class WorkspacesService {
 
     const workspace = this.workspaceRepository.create({
       ...createWorkspaceDto,
-      ownerId: user.id,
+      ownerId: user.userId,
     });
 
     // rollback transaction
     return await this.entityManager.transaction(
       async (transactionalEntityManager) => {
         try {
+          // upload logo
           const storedLogo = await this.uploadLogo({
             logo: logo,
-            userId: user.id,
+            userId: user.userId,
           });
           workspace.logo = storedLogo;
+
+          // save workspace
           const savedWorkspace =
             await transactionalEntityManager.save(workspace);
+
+          // create defaule project
+          await this.projectService.create(
+            {
+              name: 'default',
+              workspaceId: savedWorkspace.id,
+              color: '#808080', // gray
+            },
+            user,
+          );
+          // add this owner as member of this workspace
+          const newMember = this.memberRepository.create({
+            active: true,
+            email: user.email,
+            role: WORKSPACE_MEMBER_ROLE.OWNER,
+            workspaceId: savedWorkspace.id,
+            userId: user.userId,
+          });
+          console.log({ newMember });
+          console.log({ userId: user.userId });
+          await transactionalEntityManager.save(newMember);
 
           return savedWorkspace;
         } catch (error) {
           console.log({ error });
+          // TODO:: remove logo
           throw new NotImplementedException(
             `Failed to create workspace: ${error.message}`,
           );
@@ -100,49 +134,73 @@ export class WorkspacesService {
   }
 
   async findOne(id: string) {
-    return await this.workspaceRepository.findOneBy({ id });
+    // const data = await this.workspaceRepository.findOne({ where: { id } });
+    const data = await this.workspaceRepository.findOne({
+      where: { _id: new ObjectId(id) },
+    });
+    return data;
   }
 
   async update(
     id: string,
     updateWorkspaceDto: UpdateWorkspaceDto,
     logo: Express.Multer.File,
-    user: User,
+    user: CurrentUserProps,
   ) {
-    await this.entityManager.transaction(async (transactionalEntityManager) => {
-      const workspace = await this.findOne(id);
+    return await this.entityManager.transaction(
+      async (transactionalEntityManager) => {
+        const workspace = await this.findOne(id);
+        if (!workspace) {
+          throw new NotFoundException(`workspace with ${id} not exist`);
+        }
 
-      if (!workspace) {
-        throw new NotFoundException(`workspace with ${id} not exist`);
-      }
-      // transactionalEntityManager.merge(
-      //   WorkspaceEntity,
-      //   workspace,
-      //   updateWorkspaceDto,
-      // );
-      // Object.assign(workspace, updateWorkspaceDto);
+        // update logo
+        if (logo) {
+          await this.s3Service.replaceFile({
+            newFile: logo,
+            userId: user.userId,
+          });
+        }
 
-      if (logo) {
-        await this.s3Service.replaceFile({
-          newFile: logo,
-          userId: user.id,
-        });
-      }
-
-      if (updateWorkspaceDto?.name) {
-        workspace.name = updateWorkspaceDto.name;
-      }
-
-      return await transactionalEntityManager.save(workspace);
-    });
+        // update name
+        if (updateWorkspaceDto?.name) {
+          // check if this name is new
+          if (workspace.name != updateWorkspaceDto.name) {
+            const exist = await this.workspaceRepository.findOneBy({
+              name: updateWorkspaceDto.name,
+              ownerId: user.userId,
+            });
+            if (exist) {
+              throw new ConflictException(
+                'Workspace with this name already exist',
+              );
+            }
+          }
+          workspace.name = updateWorkspaceDto.name;
+        }
+        return await transactionalEntityManager.save(workspace);
+      },
+    );
   }
 
-  async remove(id: string) {
+  async remove(id: string, user: CurrentUserProps) {
     await this.entityManager.transaction(async (transactionalEntityManager) => {
       const workspace = await this.findOne(id);
 
       if (!workspace) {
         throw new NotFoundException(`Workspace with id ${id} not exist`);
+      }
+
+      // check user role
+      const membership = await this.memberRepository.findOneBy({
+        workspaceId: id,
+        userId: user.userId,
+      });
+
+      if (!membership || membership.role !== WORKSPACE_MEMBER_ROLE.OWNER) {
+        throw new ForbiddenException(
+          'You dont have permission to delete the workspace',
+        );
       }
 
       await transactionalEntityManager.remove(WorkspaceEntity, workspace);

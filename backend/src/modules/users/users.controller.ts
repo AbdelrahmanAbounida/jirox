@@ -78,10 +78,4 @@ export class UsersController {
 
     return this.usersService.remove(id);
   }
-
-  @Get('/test')
-  @Version('2') // this is a version for specific route
-  async testVersions() {
-    return 'test';
-  }
 }

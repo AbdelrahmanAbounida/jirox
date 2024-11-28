@@ -1,20 +1,44 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { CurrentUser } from '../auth/decorator/current-user.decorator';
+import { User } from '../users/entities/user.entity';
+import { ApiTags } from '@nestjs/swagger';
+import { CurrentUserProps } from 'src/common/types/current-user';
 
-@Controller('projects')
+@Controller({
+  version: '1',
+  path: 'projects',
+})
+@ApiTags('projects')
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
-  @Post()
-  create(@Body() createProjectDto: CreateProjectDto) {
-    return this.projectsService.create(createProjectDto);
+  @Post('/create')
+  async create(
+    @Body() createProjectDto: CreateProjectDto,
+    @CurrentUser() user: CurrentUserProps,
+  ) {
+    const newProject = await this.projectsService.create(
+      createProjectDto,
+      user,
+    );
+    console.log({ newProject });
+    return newProject;
   }
 
-  @Get()
-  findAll() {
-    return this.projectsService.findAll();
+  @Get('/all/:workspaceId')
+  async findAll(@Param('workspaceId') workspaceId: string) {
+    return this.projectsService.findAll({ workspaceId });
   }
 
   @Get(':id')

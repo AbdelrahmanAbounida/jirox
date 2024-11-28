@@ -15,6 +15,7 @@ import { WorkspacesModule } from './modules/workspaces/workspaces.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
+import { MembersModule } from './modules/members/members.module';
 import awsConfig from './config/aws.config';
 
 @Module({
@@ -39,6 +40,7 @@ import awsConfig from './config/aws.config';
     TasksModule,
     ProjectsModule,
     NotificationsModule,
+    MembersModule,
   ],
   controllers: [],
   providers: [
