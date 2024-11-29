@@ -32,7 +32,7 @@ export class TasksController {
     return this.tasksService.findOne(id);
   }
 
-  @Patch(':id')
+  @Patch('/update/:id')
   async updateTask(
     @Param('id') id: string,
     @Body() updateTaskDto: UpdateTaskDto,

@@ -89,7 +89,7 @@ export class ProjectsService {
 
         // update logo
         if (logo) {
-          const oldFileName = project.logo.split('/').pop();
+          const oldFileName = project.logo?.split('/').pop()!;
           const newLogo = await this.s3Service.replaceFile({
             newFile: logo,
             userId: user.userId,
@@ -130,6 +130,19 @@ export class ProjectsService {
 
         if (!project) {
           throw new NotFoundException(`project with id ${id} not exist`);
+        }
+
+        // check if this is the only project
+        const projectsList = await this.projectRepository.find({
+          where: {
+            workspaceId: project.workspaceId,
+          },
+        });
+
+        if (projectsList.length == 1) {
+          throw new ForbiddenException(
+            "You can't keep workspace empty create new project  before deleting this one",
+          );
         }
 
         // check user role

@@ -27,7 +27,8 @@ async function createApp(expressApp?: express.Express) {
   console.log('NestFactory created');
 
   app.enableCors();
-  app.useGlobalPipes(new ValidationPipe({ whitelist: false }));
+  app.useGlobalPipes(new ValidationPipe({ whitelist: false, transform: true })); // transform to allow multer file parser
+
   app.useGlobalInterceptors(
     // new LoggerInterceptor(),
     new ClassSerializerInterceptor(app.get(Reflector)),

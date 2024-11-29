@@ -49,7 +49,7 @@ export class AwsS3Service {
     userId,
   }: {
     newFile: Express.Multer.File;
-    oldFileName: string;
+    oldFileName?: string;
     userId: string;
   }): Promise<string> {
     const params = {

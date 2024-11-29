@@ -10,6 +10,7 @@ import {
   ParseFilePipeBuilder,
   HttpStatus,
   BadRequestException,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -18,6 +19,7 @@ import { CurrentUser } from '../auth/decorator/current-user.decorator';
 import { User } from '../users/entities/user.entity';
 import { ApiTags } from '@nestjs/swagger';
 import { CurrentUserProps } from 'src/common/types/current-user';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller({
   version: '1',
@@ -50,7 +52,8 @@ export class ProjectsController {
     return this.projectsService.findOne(id);
   }
 
-  @Patch(':id')
+  @Patch('/update/:id')
+  @UseInterceptors(FileInterceptor('logo'))
   async updateProject(
     @Param('id') id: string,
     @CurrentUser() user: CurrentUserProps,
@@ -75,7 +78,6 @@ export class ProjectsController {
         throw new BadRequestException('File validation failed.');
       }
     }
-
     return this.projectsService.update(id, updateProjectDto, logo, user);
   }
 
