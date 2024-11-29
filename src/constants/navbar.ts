@@ -16,7 +16,7 @@ export const NAVBAR_HEADERS: NavbarHeaderProps[] = [
     description: "View all of your tasks here",
   },
   {
-    pathname: "porjects",
+    pathname: "projects",
     title: "Project",
     description: "View all of your project tasks here",
   },

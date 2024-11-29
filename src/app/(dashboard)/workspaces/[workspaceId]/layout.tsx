@@ -26,7 +26,6 @@ export default function DashboardLayout({
         <div className="flex-grow">
           <Navbar />
         </div>
-        <div>{params.workspaceId}</div>
         <div className="w-full h-full flex-grow items-start justify-start">
           {children}
         </div>

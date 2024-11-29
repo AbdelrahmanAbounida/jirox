@@ -11,6 +11,8 @@ import React from "react";
 const ProjectSettings = () => {
   const router = useRouter();
 
+  // TODO:: copy workspace settings here
+
   return (
     <div className="w-full h-full bg-gray-100">
       <div className="mx-auto  max-w-xl pt-9  flex flex-col gap-5 ">

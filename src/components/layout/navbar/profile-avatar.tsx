@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,9 +13,20 @@ import Link from "next/link";
 import { logout } from "@/actions/auth/logout";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { useSession } from "next-auth/react";
 
 const ProfileDropdown = () => {
-  const currentUser = useCurrentUser();
+  const session = useSession();
+  const user = session.data?.user;
+  const status = session.status;
+  const [currentUser, setcurrentUser] = useState<any>(user);
+
+  useEffect(() => {
+    if (user && !currentUser) {
+      setcurrentUser(user);
+    }
+  }, [user]);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="focus:outline-none">

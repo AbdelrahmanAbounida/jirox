@@ -13,8 +13,8 @@ const Navbar = () => {
   const description = out?.description;
 
   return (
-    <div className="h-[60px] mb-6 w-full">
-      <div className="flex w-full items-center justify-between">
+    <div className=" mb-3 w-full px-4 py-1 bg-slate-50 rounded-md">
+      <div className="flex w-full items-center justify-between py-2 ">
         {/** title, description  */}
         <div className="flex flex-col ">
           <h1 className="text-lg font-medium">{title}</h1>

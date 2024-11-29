@@ -9,8 +9,13 @@ import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TasksFilters from "@/components/tasks/tasks-filters";
 import NewTaskmodal from "./modals/new-task-modal";
+import { useProjectTasks } from "@/hooks/tasks/use-project-tasks";
 
 const MyTasks = ({ projectId }: { projectId?: string }) => {
+  const { data: projectTasks, isLoading } = useProjectTasks({
+    projectId: projectId!,
+  });
+
   return (
     <div className="border rounded-lg flex flex-col h-full">
       <Tabs defaultValue="table" className="flex flex-col flex-grow h-full">
@@ -35,6 +40,7 @@ const MyTasks = ({ projectId }: { projectId?: string }) => {
         </div>
 
         {/** Tabs Content */}
+        {/** TOdo:: pass loaded tasks to each one of those */}
         <TabsContent value="table" className="w-full h-full">
           <TasksTable />
         </TabsContent>
