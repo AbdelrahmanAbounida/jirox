@@ -1,4 +1,4 @@
-import { IsDate, IsEnum, IsString } from 'class-validator';
+import { IsDate, IsEnum, IsOptional, IsString } from 'class-validator';
 import { TaskEnum } from '../enums/task.enum';
 
 export class CreateTaskDto {
@@ -12,7 +12,8 @@ export class CreateTaskDto {
   status: TaskEnum;
 
   @IsString()
-  assigneeId: string;
+  @IsOptional()
+  assigneeId?: string;
 
   @IsString()
   projectId: string;

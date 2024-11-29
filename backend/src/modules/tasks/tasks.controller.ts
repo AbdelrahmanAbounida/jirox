@@ -12,8 +12,13 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { CurrentUser } from '../auth/decorator/current-user.decorator';
 import { CurrentUserProps } from 'src/common/types/current-user';
+import { ApiTags } from '@nestjs/swagger';
 
-@Controller('tasks')
+@Controller({
+  path: 'tasks',
+  version: '1',
+})
+@ApiTags('Tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
@@ -23,7 +28,7 @@ export class TasksController {
   }
 
   @Get('/project-tasks/:projectId')
-  async findAllProjectTasks(@Param('projectId') projectId: string) {
+  findAllProjectTasks(@Param('projectId') projectId: string) {
     return this.tasksService.getProjectTasks({ projectId });
   }
 

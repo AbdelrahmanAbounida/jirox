@@ -16,18 +16,21 @@ export class TaskEntity extends AbstractEnttiy<TaskEntity> {
   @Column({ type: 'enum', enum: TaskEnum })
   status: TaskEnum;
 
-  @Column({ type: 'varchar' })
-  assigneeId: string;
+  @Column({ type: 'varchar', nullable: true })
+  assigneeId?: string;
 
   @Column({ type: 'varchar' })
   projectId: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  completedAt?: Date;
 
   @ManyToOne(() => WorkspaceMemberEntity, (member) => member.tasks, {
     cascade: true,
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'assigneeId' })
-  assignee: WorkspaceMemberEntity;
+  assignee?: WorkspaceMemberEntity;
 
   // @Exclude()
   @ManyToOne(() => ProjectEntity, (project) => project.tasks, {
