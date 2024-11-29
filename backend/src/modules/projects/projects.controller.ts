@@ -6,6 +6,10 @@ import {
   Patch,
   Param,
   Delete,
+  UploadedFile,
+  ParseFilePipeBuilder,
+  HttpStatus,
+  BadRequestException,
 } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -37,22 +41,46 @@ export class ProjectsController {
   }
 
   @Get('/all/:workspaceId')
-  async findAll(@Param('workspaceId') workspaceId: string) {
+  async findAllWorkspaceProjects(@Param('workspaceId') workspaceId: string) {
     return this.projectsService.findAll({ workspaceId });
   }
 
-  @Get(':id')
+  @Get('/:id')
   findOne(@Param('id') id: string) {
-    return this.projectsService.findOne(+id);
+    return this.projectsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
-    return this.projectsService.update(+id, updateProjectDto);
+  async updateProject(
+    @Param('id') id: string,
+    @CurrentUser() user: CurrentUserProps,
+    @Body() updateProjectDto: UpdateProjectDto,
+    @UploadedFile() logo?: Express.Multer.File,
+  ) {
+    if (logo) {
+      try {
+        const fileValidator = new ParseFilePipeBuilder()
+          .addFileTypeValidator({
+            fileType: /^(image\/jpeg|image\/png|image\/svg\+xml)$/,
+          })
+          .addMaxSizeValidator({
+            maxSize: 1000000 * 10,
+          })
+          .build({
+            errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+          });
+
+        await fileValidator.transform(logo);
+      } catch (error) {
+        throw new BadRequestException('File validation failed.');
+      }
+    }
+
+    return this.projectsService.update(id, updateProjectDto, logo, user);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.projectsService.remove(+id);
+  async remove(@Param('id') id: string, @CurrentUser() user: CurrentUserProps) {
+    return this.projectsService.remove(id, user);
   }
 }

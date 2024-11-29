@@ -11,6 +11,9 @@ export class ProjectEntity extends AbstractEnttiy<ProjectEntity> {
   name: string;
 
   @Column({ type: 'varchar' })
+  logo: string;
+
+  @Column({ type: 'varchar' })
   ownerId: string;
 
   @Column({ type: 'varchar' })

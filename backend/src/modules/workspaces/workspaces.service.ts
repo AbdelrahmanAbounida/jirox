@@ -149,7 +149,9 @@ export class WorkspacesService {
   ) {
     return await this.entityManager.transaction(
       async (transactionalEntityManager) => {
-        const workspace = await this.findOne(id);
+        const workspace = await this.workspaceRepository.findOneBy({
+          _id: new ObjectId(id),
+        });
         if (!workspace) {
           throw new NotFoundException(`workspace with ${id} not exist`);
         }
