@@ -18,7 +18,7 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Post('/create')
-  create(@Body() createTaskDto: CreateTaskDto) {
+  async createTask(@Body() createTaskDto: CreateTaskDto) {
     return this.tasksService.create(createTaskDto);
   }
 
@@ -28,17 +28,24 @@ export class TasksController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findTask(@Param('id') id: string) {
     return this.tasksService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto) {
-    return this.tasksService.update(id, updateTaskDto);
+  async updateTask(
+    @Param('id') id: string,
+    @Body() updateTaskDto: UpdateTaskDto,
+    @CurrentUser() user: CurrentUserProps,
+  ) {
+    return this.tasksService.update(id, updateTaskDto, user);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @CurrentUser() user: CurrentUserProps) {
+  async removeTask(
+    @Param('id') id: string,
+    @CurrentUser() user: CurrentUserProps,
+  ) {
     return this.tasksService.remove(id, user);
   }
 }

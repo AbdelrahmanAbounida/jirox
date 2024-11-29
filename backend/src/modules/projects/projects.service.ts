@@ -39,6 +39,8 @@ export class ProjectsService {
         'Project with the same name already exist in this workspace',
       );
     }
+
+    // TODO:: not all user should be able to create a project
     const newProject = await this.entityManager.transaction(
       async (transactionalEntityManager) => {
         const newProject = this.projectRepository.create({
@@ -47,7 +49,6 @@ export class ProjectsService {
           workspaceId: createProjectDto.workspaceId,
           color: createProjectDto.color,
         });
-        console.log({ newProject });
         return await transactionalEntityManager.save(newProject);
       },
     );
@@ -82,6 +83,9 @@ export class ProjectsService {
         if (!project) {
           throw new NotFoundException(`project with ${id} not exist`);
         }
+
+        // check role
+        await this.checkUserRole(project, user);
 
         // update logo
         if (logo) {
@@ -129,24 +133,29 @@ export class ProjectsService {
         }
 
         // check user role
-        const membership = await this.memberRepository.findOneBy({
-          workspaceId: project.workspaceId,
-          userId: user.userId,
-        });
-
-        if (
-          !membership ||
-          (membership.role !== WORKSPACE_MEMBER_ROLE.OWNER &&
-            membership.role !== WORKSPACE_MEMBER_ROLE.ADMINISTRATOR) ||
-          project.ownerId != user.userId
-        ) {
-          throw new ForbiddenException(
-            'You dont have permission to delete the project',
-          );
-        }
+        await this.checkUserRole(project, user);
 
         return await transactionalEntityManager.remove(project);
       },
     );
+  }
+
+  async checkUserRole(project: ProjectEntity, user: CurrentUserProps) {
+    const membership = await this.memberRepository.findOneBy({
+      workspaceId: project.workspaceId,
+      userId: user.userId,
+    });
+
+    if (
+      !membership ||
+      (membership.role !== WORKSPACE_MEMBER_ROLE.OWNER &&
+        membership.role !== WORKSPACE_MEMBER_ROLE.ADMINISTRATOR) ||
+      project.ownerId != user.userId
+    ) {
+      throw new ForbiddenException(
+        'You dont have permission to delete the task',
+      );
+    }
+    return;
   }
 }

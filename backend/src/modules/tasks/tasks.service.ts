@@ -51,8 +51,30 @@ export class TasksService {
     });
   }
 
-  update(id: string, updateTaskDto: UpdateTaskDto) {
-    return `This action updates a #${id} task`;
+  async update(
+    id: string,
+    updateTaskDto: UpdateTaskDto,
+    user: CurrentUserProps,
+  ) {
+    return this.entityManager.transaction(
+      async (transactionalEntityManager) => {
+        // checlk if task exist
+        const exist = await this.taskRepository.findOneBy({
+          _id: new ObjectId(id),
+          project: true,
+        });
+        if (!exist) {
+          throw new NotFoundException('No Task found with this id');
+        }
+
+        //  check user role
+        await this.checkUserRole(exist, user);
+
+        // update task using updateTaskDTO
+        const updatedTask = this.taskRepository.merge(exist, updateTaskDto);
+        return transactionalEntityManager.save(updatedTask);
+      },
+    );
   }
 
   async remove(id: string, user: CurrentUserProps) {
@@ -74,24 +96,28 @@ export class TasksService {
         }
 
         // check user role
-        const membership = await this.memberRepository.findOneBy({
-          workspaceId: task.project.workspaceId,
-          userId: user.userId,
-        });
-
-        if (
-          !membership ||
-          (membership.role !== WORKSPACE_MEMBER_ROLE.OWNER &&
-            membership.role !== WORKSPACE_MEMBER_ROLE.ADMINISTRATOR) ||
-          task.assigneeId != user.userId
-        ) {
-          throw new ForbiddenException(
-            'You dont have permission to delete the task',
-          );
-        }
-
+        await this.checkUserRole(task, user);
         return await transactionalEntityManager.remove(task);
       },
     );
+  }
+
+  async checkUserRole(task: TaskEntity, user: CurrentUserProps) {
+    const membership = await this.memberRepository.findOneBy({
+      workspaceId: task.project.workspaceId,
+      userId: user.userId,
+    });
+
+    if (
+      !membership ||
+      (membership.role !== WORKSPACE_MEMBER_ROLE.OWNER &&
+        membership.role !== WORKSPACE_MEMBER_ROLE.ADMINISTRATOR) ||
+      task.assigneeId != user.userId
+    ) {
+      throw new ForbiddenException(
+        'You dont have permission to delete the task',
+      );
+    }
+    return;
   }
 }
