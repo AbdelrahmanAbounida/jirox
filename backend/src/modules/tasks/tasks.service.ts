@@ -27,10 +27,13 @@ export class TasksService {
 
   async create(createTaskDto: CreateTaskDto) {
     // create task
-    await this.entityManager.transaction(async (transactionalEntityManager) => {
-      const task = this.taskRepository.create(createTaskDto);
-      return await transactionalEntityManager.save(task);
-    });
+    return this.entityManager.transaction(
+      async (transactionalEntityManager) => {
+        const task = this.taskRepository.create(createTaskDto);
+        console.log({ task });
+        return transactionalEntityManager.save(task);
+      },
+    );
   }
 
   async getProjectTasks({ projectId }: { projectId: string }) {
