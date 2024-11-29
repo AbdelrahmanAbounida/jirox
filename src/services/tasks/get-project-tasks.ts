@@ -1,4 +1,4 @@
-import { Task } from "@/components/tasks/tasks-kanban/interfaces";
+import { Task } from "@/types/task";
 import apiClient from "@/lib/api-client";
 
 export const getProjectTasks = async ({ projectId }: { projectId: string }) => {

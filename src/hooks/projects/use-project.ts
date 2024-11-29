@@ -9,6 +9,9 @@ const fetcher = async ([key, projectId]: [string, string]) => {
 };
 
 export const useProjectDetails = ({ projectId }: { projectId: string }) => {
-  const { data, isLoading, error } = useSWR(["project", projectId], fetcher);
+  const { data, isLoading, error } = useSWR(
+    ["projectDetails", projectId],
+    fetcher
+  );
   return { data, isLoading, error };
 };

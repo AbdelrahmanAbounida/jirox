@@ -1,14 +1,18 @@
 "use client";
-import InfoCard from "@/components/home/info-card";
+import InfoCard, { InfoCardSkeleton } from "@/components/home/info-card";
 import MyTasks from "@/components/my-tasks";
 import ProjectTitle from "@/components/tasks/project-title";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProjectDetails } from "@/hooks/projects/use-project";
 import { useProjectTasks } from "@/hooks/tasks/use-project-tasks";
+import {
+  getTaskAnalytics,
+  TaskAnalyticsProps,
+} from "@/services/analytics/tasks-analytics";
 import { Pencil } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface ProjectPageParams {
   params: {
@@ -27,16 +31,28 @@ const ProjectPage = ({ params }: ProjectPageParams) => {
     projectId: params.projectId,
   });
 
+  const [taskAnalytics, setTaskAnalytics] = useState<TaskAnalyticsProps>();
+
+  useEffect(() => {
+    if (!isLoading && !currentProject) {
+      router.push("/workspaces");
+    }
+  }, [isLoading, currentProject]);
+
+  useEffect(() => {
+    if (!LoadingTasks) {
+      setTaskAnalytics(getTaskAnalytics(projectTasks!));
+    }
+  }, [LoadingTasks, projectTasks]);
+
   return (
     <div className="h-full">
-      {/** TODO:: Show Project Details like tasks list , members  */}
-
       {/** title, edit project */}
-      <div className="flex items-center justify-between w-full p-3 mb-5">
+      <div className="flex items-center justify-between w-full p-3  ">
         {isLoading ? (
           <Skeleton className="w-[100px] h-7" />
         ) : (
-          <ProjectTitle title={currentProject?.name!} />
+          <ProjectTitle className="text-lg" title={currentProject?.name!} />
         )}
         <Link
           href={`/projects/${params.projectId}/settings`}
@@ -47,13 +63,36 @@ const ProjectPage = ({ params }: ProjectPageParams) => {
         </Link>
       </div>
 
-      {/** TODO:: start here  */}
-      <div className="flex flex-wrap items-center gap-3 my-3">
-        <InfoCard title="Total Tasks" value={6} incrementValue={6} />
-        <InfoCard title="Total Tasks" value={6} incrementValue={6} />
-        <InfoCard title="Total Tasks" value={6} incrementValue={6} />
-        <InfoCard title="Total Tasks" value={6} incrementValue={6} />
-      </div>
+      {LoadingTasks ? (
+        <div className="flex flex-wrap items-center gap-3 mb-3">
+          {[1, 2, 3, 4].map((_, index) => (
+            <InfoCardSkeleton key={index} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-wrap items-center gap-3 mb-3">
+          <InfoCard
+            title="Total Tasks"
+            incrementValue={taskAnalytics?.totalYesterday!}
+            value={taskAnalytics?.total!}
+          />
+          <InfoCard
+            title="Assigned Tasks"
+            incrementValue={taskAnalytics?.assigned!}
+            value={taskAnalytics?.assigned!}
+          />
+          <InfoCard
+            title="Completed Tasks"
+            incrementValue={taskAnalytics?.completed!}
+            value={taskAnalytics?.completed!}
+          />
+          <InfoCard
+            title="OverDue Tasks"
+            incrementValue={taskAnalytics?.overdue!}
+            value={taskAnalytics?.overdue!}
+          />
+        </div>
+      )}
 
       {/** list of task views */}
       <div className="h-full pb-4">

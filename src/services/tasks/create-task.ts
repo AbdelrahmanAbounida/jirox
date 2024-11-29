@@ -1,4 +1,5 @@
 import apiClient from "@/lib/api-client";
+import { Task } from "@/types/task";
 
 // TODO:: pass the task items
 export const createTask = async ({
@@ -8,7 +9,7 @@ export const createTask = async ({
   content: string;
   stars: number;
 }) => {
-  const task = await apiClient({
+  const task: Task | any = await apiClient({
     endpoint: "/tasks/create",
     method: "POST",
     body: {

@@ -5,3 +5,11 @@ export enum WORKSPACE_MEMBER_ROLE {
   CONTRIBUTOR = "CONTRIBUTOR",
   VIEWER = "VIEWER",
 }
+
+export enum TaskEnum {
+  BACKLOG = "BACKLOG",
+  IN_PROGRESS = "IN_PROGRESS",
+  IN_REVIEW = "IN_REVIEW",
+  TODO = "TODO",
+  DONE = "DONE",
+}

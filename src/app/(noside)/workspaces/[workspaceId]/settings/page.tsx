@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import { updateWorkspace } from "@/services/workspaces/update-workspace";
 import ConfirmDeleteModal from "@/components/modals/confirm-delete-modal";
 import { deleteWorkspace } from "@/services/workspaces/delete-wokspace";
+import { mutate } from "swr";
 
 interface PageProps {
   params: {
@@ -90,6 +91,7 @@ const Settings = ({ params }: PageProps) => {
           return;
         }
         toast.success("Workspace updated Successfully");
+        mutate([workspace?.id, "currentWorkspace"]);
         // router.push(`/workspaces/${resp?.id}/home`);
       }
     } catch (error) {
@@ -130,10 +132,6 @@ const Settings = ({ params }: PageProps) => {
       setdeleteLoading(false);
     }
   };
-
-  // if (isLoading) {
-  //   return <SettingsSkeleton />;
-  // }
 
   return (
     <div className="w-full h-full gap-7 flex flex-col bg-gray-100  items-center justify-start rounded-md">

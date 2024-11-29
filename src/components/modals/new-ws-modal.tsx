@@ -82,8 +82,6 @@ const NewWorkspaceModal = ({
         logo: uploadedLogo,
       });
 
-      console.log({ resp });
-
       if (resp?.error || (resp?.statusCode && resp?.statusCode !== 200)) {
         toast.error(resp?.message);
       } else {

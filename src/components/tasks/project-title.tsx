@@ -15,10 +15,10 @@ const ProjectTitle = ({
         className
       )}
     >
-      <Avatar className="rounded-md uppercase bg-blue-600 text-white flex items-center justify-center h-6 w-6 ">
+      <Avatar className=" rounded-md uppercase bg-blue-600 text-white flex items-center justify-center h-6 w-6 ">
         {title && title[0]}
       </Avatar>
-      <p className="truncate overflow-hidden">{title}</p>
+      <p className="truncate overflow-hidden font-medium">{title}</p>
     </div>
   );
 };
