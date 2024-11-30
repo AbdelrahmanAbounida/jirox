@@ -8,7 +8,7 @@ import { User } from '../users/entities/user.entity';
 import { ProjectsService } from '../projects/projects.service';
 import { ProjectEntity } from '../projects/entities/project.entity';
 import { WorkspaceMemberEntity } from '../members/entities/member.entity';
-import { ProjectsModule } from '../projects/projects.module';
+import { TaskEntity } from '../tasks/entities/task.entity';
 
 @Module({
   imports: [
@@ -16,6 +16,7 @@ import { ProjectsModule } from '../projects/projects.module';
       WorkspaceEntity,
       User,
       ProjectEntity,
+      TaskEntity,
       WorkspaceMemberEntity,
     ]),
   ],

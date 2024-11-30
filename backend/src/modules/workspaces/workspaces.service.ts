@@ -19,12 +19,21 @@ import { WorkspaceMemberEntity } from '../members/entities/member.entity';
 import { WORKSPACE_MEMBER_ROLE } from '../members/enums/member.enum';
 import { ObjectId } from 'mongodb';
 import { CurrentUserProps } from 'src/common/types/current-user';
+import { TaskEntity } from '../tasks/entities/task.entity';
+import { ProjectEntity } from '../projects/entities/project.entity';
+import { In } from 'typeorm';
 
 @Injectable()
 export class WorkspacesService {
   constructor(
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
+
+    @InjectRepository(ProjectEntity)
+    private readonly projectRepository: Repository<ProjectEntity>,
+
+    @InjectRepository(TaskEntity)
+    private readonly taskRepository: Repository<TaskEntity>,
 
     @InjectRepository(WorkspaceMemberEntity)
     private readonly memberRepository: Repository<WorkspaceMemberEntity>,
@@ -139,6 +148,55 @@ export class WorkspacesService {
       where: { _id: new ObjectId(id) },
     });
     return data;
+  }
+
+  async findAllWorkspaceTasks(workspaceId: string) {
+    const workspace = await this.workspaceRepository.findOne({
+      where: { _id: new ObjectId(workspaceId) },
+    });
+
+    if (!workspace) {
+      throw new NotFoundException('Workspace not found');
+    }
+
+    // Fetch projects
+    const projects = await this.projectRepository.find({
+      where: { workspaceId },
+      select: ['_id', 'name'],
+    });
+
+    const projectMap = new Map(projects.map((p) => [p.id, p.name]));
+    const projectIds = projects.map((p) => p.id);
+
+    // Fetch tasks
+    const tasks = await this.taskRepository.find({
+      where: { projectId: { $in: projectIds } as any },
+    });
+
+    // Fetch assignees
+    const assigneeIds = tasks
+      .map((task) => task.assigneeId)
+      .filter((id): id is string => !!id)
+      .map((id) => new ObjectId(id));
+
+    const assignees = await this.memberRepository.find({
+      where: { _id: { $in: assigneeIds } as any },
+    });
+
+    const assigneeMap = new Map(
+      assignees.map((user) => [user._id.toString(), user.email]),
+    );
+
+    // Enrich tasks with project names and assignee emails
+    const enrichedTasks = tasks.map((task) => ({
+      ...task,
+      projectName: projectMap.get(task.projectId.toString()),
+      assigneeEmail: task.assigneeId
+        ? assigneeMap.get(task.assigneeId.toString()) || null
+        : null,
+    }));
+
+    return enrichedTasks;
   }
 
   async update(

@@ -75,8 +75,13 @@ export class WorkspacesController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
+  async findOneWorkspace(@Param('id') id: string) {
     return this.workspacesService.findOne(id);
+  }
+
+  @Get('/tasks/:workspaceId')
+  async getAllWorkspaceTasks(@Param('workspaceId') workspaceId: string) {
+    return this.workspacesService.findAllWorkspaceTasks(workspaceId);
   }
 
   @Patch('/update/:id')
