@@ -12,12 +12,16 @@ import { ObjectId } from 'mongodb';
 import { WorkspaceMemberEntity } from '../members/entities/member.entity';
 import { CurrentUserProps } from 'src/common/types/current-user';
 import { WORKSPACE_MEMBER_ROLE } from '../members/enums/member.enum';
+import { ProjectEntity } from '../projects/entities/project.entity';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(TaskEntity)
     private readonly taskRepository: Repository<TaskEntity>,
+
+    @InjectRepository(ProjectEntity)
+    private readonly projectRepository: Repository<ProjectEntity>,
 
     @InjectRepository(WorkspaceMemberEntity)
     private readonly memberRepository: Repository<WorkspaceMemberEntity>,
@@ -62,10 +66,7 @@ export class TasksService {
     return this.entityManager.transaction(
       async (transactionalEntityManager) => {
         // checlk if task exist
-        const exist = await this.taskRepository.findOneBy({
-          _id: new ObjectId(id),
-          project: true,
-        });
+        const exist = await this.findOne(id);
         if (!exist) {
           throw new NotFoundException('No Task found with this id');
         }
@@ -106,19 +107,22 @@ export class TasksService {
   }
 
   async checkUserRole(task: TaskEntity, user: CurrentUserProps) {
+    const project = await this.projectRepository.findOneBy({
+      _id: new ObjectId(task?.projectId),
+    });
     const membership = await this.memberRepository.findOneBy({
-      workspaceId: task.project.workspaceId,
+      workspaceId: project.workspaceId,
       userId: user.userId,
     });
 
     if (
       !membership ||
       (membership.role !== WORKSPACE_MEMBER_ROLE.OWNER &&
-        membership.role !== WORKSPACE_MEMBER_ROLE.ADMINISTRATOR) ||
-      task.assigneeId != user.userId
+        membership.role !== WORKSPACE_MEMBER_ROLE.ADMINISTRATOR &&
+        task.assigneeId != user.userId)
     ) {
       throw new ForbiddenException(
-        'You dont have permission to delete the task',
+        'You dont have permission to do this action',
       );
     }
     return;

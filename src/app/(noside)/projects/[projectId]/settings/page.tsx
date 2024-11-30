@@ -29,13 +29,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import ConfirmDeleteModal from "@/components/modals/confirm-delete-modal";
 import { updateProjectSchema } from "@/schemas/project-form-schema";
-import { ProjectColor } from "@/schemas/enums";
 import { cn } from "@/lib/utils";
 import { useProjectDetails } from "@/hooks/projects/use-project";
 import { updateProject } from "@/services/projects/update-project";
 import { deleteProject } from "@/services/projects/delete-project";
 import { getEnumNameByColor, mapColorToEnum } from "@/utils/project-utils";
 import { mutate } from "swr";
+import { ProjectColor } from "@/constants/enums";
 
 interface PageProps {
   params: {

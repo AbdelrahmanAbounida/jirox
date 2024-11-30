@@ -52,9 +52,16 @@ const MyTasks = ({
         </div>
 
         {/** Tabs Content */}
-        {/** TOdo:: pass loaded tasks to each one of those */}
         <TabsContent value="table" className="w-full h-full">
-          <TasksTable workspaceTasks={workspaceTasks!} isLoading={isLoading} />
+          <TasksTable
+            workspaceTasks={
+              workspaceTasks?.map((task) => ({
+                ...task,
+                workspaceId: workspaceId!,
+              }))!
+            }
+            isLoading={isLoading}
+          />
         </TabsContent>
         <TabsContent value="kanban" className="w-full h-full  ">
           <TasksKanban workspaceTasks={workspaceTasks!} isLoading={isLoading} />

@@ -1,7 +1,7 @@
 export enum TaskEnum {
   BACKLOG = 'BACKLOG',
-  IN_PROGRESS = 'INPROGRESS',
-  IN_REVIEW = 'INREVIEW',
+  INPROGRESS = 'INPROGRESS',
+  INREVIEW = 'INREVIEW',
   TODO = 'TODO',
   DONE = 'DONE',
 }

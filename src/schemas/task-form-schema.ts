@@ -1,5 +1,5 @@
+import { TaskEnum } from "@/constants/enums";
 import { z } from "zod";
-import { TASK_STATUS } from "./enums";
 
 const stripTime = (date: Date): Date => {
   return new Date(date.setHours(0, 0, 0, 0));
@@ -13,7 +13,7 @@ export const createTaskSchema = z.object({
       message: "Due Date cannot be in the past",
     }),
   assigneeId: z.string().min(1, { message: "Assignee is required" }),
-  status: z.nativeEnum(TASK_STATUS),
+  status: z.nativeEnum(TaskEnum),
   projectId: z.string().min(1, { message: "Project is reqiured" }),
 });
 

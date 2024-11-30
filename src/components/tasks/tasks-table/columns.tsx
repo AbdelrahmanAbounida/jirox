@@ -15,19 +15,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
 import { DataTableColumnHeader } from "./column-header";
-import { Task } from "@/types/task";
+import { Task, TaskWithWorkspaceId } from "@/types/task";
 import { TaskEnum } from "@/constants/enums";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
-import { StatusAvatar } from "./status-avatar";
 import ProjectTitle from "../project-title";
-import { Member } from "@/types/members";
+import EditTaskModal from "@/components/modals/edit-task-modal";
 
-export const TaskColumns: ColumnDef<Task>[] = [
+export const TaskColumns: ColumnDef<TaskWithWorkspaceId>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -119,10 +114,10 @@ export const TaskColumns: ColumnDef<Task>[] = [
         case TaskEnum.BACKLOG:
           statusColor = "bg-red-500";
           break;
-        case TaskEnum.IN_PROGRESS:
+        case TaskEnum.INPROGRESS:
           statusColor = "bg-yellow-500";
           break;
-        case TaskEnum.IN_REVIEW:
+        case TaskEnum.INREVIEW:
           statusColor = "bg-blue-500";
           break;
         case TaskEnum.TODO:
@@ -158,8 +153,6 @@ export const TaskColumns: ColumnDef<Task>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[170px]">
-            {/* <DropdownMenuItem className="cursor-pointer">Edit</DropdownMenuItem> */}
-
             <DropdownMenuGroup className="gap-1 flex flex-col">
               <DropdownMenuItem>
                 <SquareArrowOutUpRight className="" />
@@ -171,10 +164,12 @@ export const TaskColumns: ColumnDef<Task>[] = [
                 <span className="">Open Project</span>
               </DropdownMenuItem>
 
-              <DropdownMenuItem>
-                <Pencil className="h-4 w-4 ring-0 focus:ring-0" />
-                <span className="">Edit Task</span>
-              </DropdownMenuItem>
+              <EditTaskModal taskId={task.id} workspaceId={task.workspaceId}>
+                <div className="flex items-center gap-2 hover:bg-slate-100 p-[5px] rounded-md ">
+                  <Pencil className="h-4 w-4 ring-0 focus:ring-0 mr-1" />
+                  <span className="text-sm">Edit Task</span>
+                </div>
+              </EditTaskModal>
               <DropdownMenuSeparator className="h-[1px] bg-gray-200 " />
 
               <DropdownMenuItem className="text-red-500 focus:bg-red-50 focus:text-red-500">

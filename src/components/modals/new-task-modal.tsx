@@ -40,13 +40,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import ProjectTitle from "../tasks/project-title";
-import { TASK_STATUS } from "@/schemas/enums";
 import { useWorkspaceProjects } from "@/hooks/projects/use-projects";
 import { Project } from "@/types/project";
 import { useWorkspaceMembers } from "@/hooks/members/use-workspace-members";
 import { toast } from "sonner";
 import { createTask } from "@/services/tasks/create-task";
 import { mutate } from "swr";
+import { TaskEnum } from "@/constants/enums";
 
 const NewTaskmodal = ({
   children,
@@ -231,7 +231,7 @@ const NewTaskmodal = ({
                     </FormControl>
 
                     <SelectContent>
-                      {Object.entries(TASK_STATUS)
+                      {Object.entries(TaskEnum)
                         // .filter((val) => parseInt(val.toString()))
                         .map(([key, val], index) => (
                           <SelectItem key={index} value={key.toString()}>

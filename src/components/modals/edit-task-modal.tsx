@@ -3,14 +3,12 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import MainButton from "../main-btn";
-import { PlusIcon } from "lucide-react";
+import { Loader, PlusIcon } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -18,14 +16,13 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { createTaskSchema } from "@/schemas/task-form-schema";
+import { editTaskSchema } from "@/schemas/task-form-schema";
 import {
   Popover,
   PopoverContent,
@@ -43,25 +40,77 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import ProjectTitle from "../tasks/project-title";
-import { TASK_STATUS } from "@/schemas/enums";
+import { useWorkspaceProjects } from "@/hooks/projects/use-projects";
+import { useWorkspaceMembers } from "@/hooks/members/use-workspace-members";
+import { toast } from "sonner";
+import { mutate } from "swr";
+import { TaskEnum } from "@/constants/enums";
+import { useTask } from "@/hooks/tasks/use-task";
+import { mapStatusToEnum } from "@/utils/task-utils";
+import { updateTask } from "@/services/tasks/update-task";
 
 const EditTaskModal = ({
   children,
-  projectId,
+  workspaceId,
+  taskId,
 }: {
-  projectId?: string;
+  workspaceId: string;
+  taskId: string;
   children?: React.ReactNode;
 }) => {
-  const form = useForm<z.infer<typeof createTaskSchema>>({
-    resolver: zodResolver(createTaskSchema),
+  const [updateLoading, setupdateLoading] = useState(false);
+  const [open, setopen] = useState(false);
+  const { data: currentTask, isLoading } = useTask(taskId);
+
+  const form = useForm<z.infer<typeof editTaskSchema>>({
+    resolver: zodResolver(editTaskSchema),
     defaultValues: {},
   });
-  function onSubmit(values: z.infer<typeof createTaskSchema>) {
-    console.log(values);
+
+  async function onSubmit(values: z.infer<typeof editTaskSchema>) {
+    setupdateLoading(true);
+
+    try {
+      const resp = await updateTask({ ...values, taskId });
+      if (resp?.error || (resp?.statusCode && resp?.statusCode !== 200)) {
+        toast.error(resp?.message);
+      } else {
+        if (!resp || !resp?.id) {
+          toast.error("Something went wrong while updating this Task");
+          return;
+        }
+        toast.success("Task updated Successfully");
+        setopen(false);
+        form.reset();
+
+        console.log({ resp });
+        mutate([workspaceId, "workspaceTasks"]);
+      }
+    } catch (error) {
+      console.log({ error });
+      toast.error("Something went wrong! Failed to update task");
+    } finally {
+      setupdateLoading(false);
+    }
   }
 
+  const { data: AllProjects, isLoading: LoadingProjects } =
+    useWorkspaceProjects({ workspaceId: workspaceId! });
+  const { data: workspaceMembers, isLoading: LoadingMembers } =
+    useWorkspaceMembers({ workspaceId: workspaceId });
+
+  useEffect(() => {
+    if (!isLoading && currentTask) {
+      form.setValue("assigneeId", currentTask.assigneeId!);
+      form.setValue("dueDate", new Date(currentTask.dueDate!));
+      form.setValue("name", currentTask.name!);
+      form.setValue("status", mapStatusToEnum(currentTask.status)!);
+      form.setValue("projectId", currentTask.projectId!);
+    }
+  }, [currentTask, isLoading]);
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setopen}>
       <DialogTrigger>
         {children ?? (
           <MainButton>
@@ -72,6 +121,8 @@ const EditTaskModal = ({
       </DialogTrigger>
 
       <DialogContent>
+        <DialogTitle>Update Task</DialogTitle>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             {/** 1- task Name */}
@@ -121,8 +172,12 @@ const EditTaskModal = ({
                     >
                       <Calendar
                         mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
+                        // selected={field.value}
+                        // onSelect={field.onChange}
+                        selected={
+                          field.value ? new Date(field.value) : undefined
+                        }
+                        onSelect={(date) => field.onChange(date)}
                         disabled={(date) => date < new Date()}
                         initialFocus
                       />
@@ -142,22 +197,21 @@ const EditTaskModal = ({
                 <FormItem>
                   <FormLabel>Assignee</FormLabel>
                   <Select
+                    disabled={LoadingMembers}
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger disabled={LoadingMembers}>
                         <SelectValue placeholder="" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="m@example.com">
-                        m@example.com
-                      </SelectItem>
-                      <SelectItem value="m@google.com">m@google.com</SelectItem>
-                      <SelectItem value="m@support.com">
-                        m@support.com
-                      </SelectItem>
+                      {workspaceMembers?.map((member, index) => (
+                        <SelectItem key={index} value={member.id}>
+                          {member.email}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -173,23 +227,18 @@ const EditTaskModal = ({
                 <FormItem>
                   <FormLabel>Status</FormLabel>
                   <Select
+                    disabled={LoadingMembers}
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger disabled={LoadingProjects}>
                         <SelectValue placeholder="" />
                       </SelectTrigger>
                     </FormControl>
 
                     <SelectContent>
-                      <SelectItem value="Test project">
-                        <ProjectTitle title="Test project" />
-                      </SelectItem>
-                    </SelectContent>
-
-                    <SelectContent>
-                      {Object.entries(TASK_STATUS)
+                      {Object.entries(TaskEnum)
                         // .filter((val) => parseInt(val.toString()))
                         .map(([key, val], index) => (
                           <SelectItem key={index} value={key.toString()}>
@@ -212,20 +261,23 @@ const EditTaskModal = ({
                   <FormLabel>Project</FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    defaultValue={
+                      field.value || AllProjects?.find((e) => !e)?.id
+                    }
                   >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Test project">
-                        <ProjectTitle title="Test project" />
-                      </SelectItem>
-                      <SelectItem value="Test project2">
-                        <ProjectTitle title="Test project2" />
-                      </SelectItem>
+                    <SelectContent
+                      defaultValue={AllProjects?.find((e) => !e)?.id}
+                    >
+                      {AllProjects?.map((project, index) => (
+                        <SelectItem key={index} value={project.id}>
+                          <ProjectTitle title={project?.name!} />
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -233,14 +285,21 @@ const EditTaskModal = ({
               )}
             />
 
-            {/* <Button type="submit">Create Task</Button> */}
+            {/* <Button type="submit">Update Task</Button> */}
             <div className="flex w-full items-center justify-between">
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
                   Cancel
                 </Button>
               </DialogClose>
-              <MainButton type="submit"> Create Task</MainButton>
+              {updateLoading ? (
+                <MainButton disabled type="submit">
+                  <Loader className="animate-spin h-4 w-4 transition-all" />{" "}
+                  Loading
+                </MainButton>
+              ) : (
+                <MainButton type="submit"> Update Task</MainButton>
+              )}
             </div>
           </form>
         </Form>

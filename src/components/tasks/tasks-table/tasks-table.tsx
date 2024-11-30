@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { DataTable } from "./data-table";
-import { Task } from "@/types/task";
+import { Task, TaskWithWorkspaceId } from "@/types/task";
 import {
   Table,
   TableBody,
@@ -15,7 +15,7 @@ const TasksTable = ({
   workspaceTasks,
   isLoading,
 }: {
-  workspaceTasks: Task[];
+  workspaceTasks: TaskWithWorkspaceId[];
   isLoading: boolean;
 }) => {
   const data = useMemo(() => workspaceTasks, [workspaceTasks, isLoading]);

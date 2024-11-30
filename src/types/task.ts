@@ -9,3 +9,5 @@ export interface Task {
   projectId: string;
   completedAt?: Date;
 }
+
+export type TaskWithWorkspaceId = Task & { workspaceId: string };

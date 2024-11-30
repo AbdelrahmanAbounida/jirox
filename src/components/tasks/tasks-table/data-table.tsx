@@ -24,11 +24,11 @@ import {
 import { useState } from "react";
 import { DataTablePagination } from "./table-pagination";
 import { TaskColumns } from "./columns";
-import { Task } from "@/types/task";
+import { Task, TaskWithWorkspaceId } from "@/types/task";
 import { Separator } from "@/components/ui/separator";
 
 interface DataTableProps<TData, TValue> {
-  data: Task[];
+  data: TaskWithWorkspaceId[];
 }
 
 export function DataTable<TData, TValue>({

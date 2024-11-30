@@ -1,4 +1,4 @@
-import { ProjectColor } from "@/schemas/enums";
+import { ProjectColor } from "@/constants/enums";
 
 export function getEnumNameByColor(color: string): ProjectColor | undefined {
   const entry = Object.entries(ProjectColor).find(

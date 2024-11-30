@@ -31,11 +31,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createProjectSchema } from "@/schemas/project-form-schema";
-import { ProjectColor } from "@/schemas/enums";
 import { createNewProject } from "@/services/projects/create-project";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { mutate } from "swr";
+import { ProjectColor } from "@/constants/enums";
 
 const NewProjectModal = ({
   children,
