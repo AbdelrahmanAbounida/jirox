@@ -21,7 +21,6 @@ const ProjectsList = ({ workspaceId }: { workspaceId: string }) => {
   if (isLoading) {
     return <ProjectsSkeleton />;
   }
-  console.log({ projectsList });
 
   if (!isLoading && error) {
     toast.error(error + "");

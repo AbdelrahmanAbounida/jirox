@@ -1,7 +1,13 @@
 import MyTasks from "@/components/my-tasks";
 
-const Tasks = () => {
-  return <MyTasks />;
+interface PageProps {
+  params: {
+    workspaceId: string;
+  };
+}
+
+const Tasks = ({ params }: PageProps) => {
+  return <MyTasks workspaceId={params.workspaceId} />;
 };
 
 export default Tasks;

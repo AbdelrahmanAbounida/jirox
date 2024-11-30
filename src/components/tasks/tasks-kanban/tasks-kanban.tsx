@@ -1,7 +1,14 @@
 import React from "react";
 import KanbanBoard from "./board";
+import { Task } from "@/types/task";
 
-const TasksKanban = () => {
+const TasksKanban = ({
+  workspaceTasks,
+  isLoading,
+}: {
+  workspaceTasks: Task[];
+  isLoading: boolean;
+}) => {
   const cols = [
     {
       id: "col1",

@@ -5,6 +5,7 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Avatar } from "../ui/avatar";
 import Link from "next/link";
+import { Task } from "@/types/task";
 
 // Setup the localizer by providing the moment instance
 const localizer = momentLocalizer(moment);
@@ -76,7 +77,13 @@ const CustomDayHeader = ({ date }: any) => (
   </div>
 );
 
-function TasksCalendar() {
+function TasksCalendar({
+  workspaceTasks,
+  isLoading,
+}: {
+  workspaceTasks: Task[];
+  isLoading: boolean;
+}) {
   const [currentView, setCurrentView] = useState(Views.MONTH);
 
   return (

@@ -96,7 +96,10 @@ const ProjectPage = ({ params }: ProjectPageParams) => {
 
       {/** list of task views */}
       <div className="h-full pb-4">
-        <MyTasks projectId={params?.projectId} />
+        <MyTasks
+          projectId={params?.projectId}
+          workspaceId={currentProject?.workspaceId!}
+        />
       </div>
     </div>
   );

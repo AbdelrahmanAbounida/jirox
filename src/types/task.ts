@@ -1,6 +1,7 @@
 import { TaskEnum } from "@/constants/enums";
 
 export interface Task {
+  id: string;
   name: string;
   dueDate: Date;
   status: TaskEnum;

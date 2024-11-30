@@ -15,6 +15,7 @@ import {
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -23,9 +24,11 @@ import {
 import { useState } from "react";
 import { DataTablePagination } from "./table-pagination";
 import { TaskColumns } from "./columns";
+import { Task } from "@/types/task";
+import { Separator } from "@/components/ui/separator";
 
 interface DataTableProps<TData, TValue> {
-  data: TData[];
+  data: Task[];
 }
 
 export function DataTable<TData, TValue>({
@@ -36,6 +39,8 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+
+  console.log({ data });
 
   const table = useReactTable({
     data,
@@ -57,8 +62,8 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div>
-      <div className="rounded-md border">
+    <div className="h-full pb-11">
+      <div className="rounded-md border h-full ">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -107,6 +112,7 @@ export function DataTable<TData, TValue>({
             )}
           </TableBody>
         </Table>
+        {data?.length < 10 && <Separator />}
       </div>
       <div className="py-2">
         <DataTablePagination table={table} />

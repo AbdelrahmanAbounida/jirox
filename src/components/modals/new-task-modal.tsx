@@ -3,14 +3,12 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import MainButton from "../main-btn";
-import { PlusIcon } from "lucide-react";
+import { Loader, PlusIcon } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -18,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -44,24 +41,69 @@ import {
 } from "@/components/ui/select";
 import ProjectTitle from "../tasks/project-title";
 import { TASK_STATUS } from "@/schemas/enums";
+import { useWorkspaceProjects } from "@/hooks/projects/use-projects";
+import { Project } from "@/types/project";
+import { useWorkspaceMembers } from "@/hooks/members/use-workspace-members";
+import { toast } from "sonner";
+import { createTask } from "@/services/tasks/create-task";
+import { mutate } from "swr";
 
 const NewTaskmodal = ({
   children,
-  projectId,
+  workspaceId,
 }: {
-  projectId?: string;
+  workspaceId: string;
   children?: React.ReactNode;
 }) => {
+  const [createLoading, setcreateLoading] = useState(false);
+  const [open, setopen] = useState(false);
+
   const form = useForm<z.infer<typeof createTaskSchema>>({
     resolver: zodResolver(createTaskSchema),
     defaultValues: {},
   });
-  function onSubmit(values: z.infer<typeof createTaskSchema>) {
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof createTaskSchema>) {
+    setcreateLoading(true);
+
+    try {
+      const resp = await createTask(values);
+      if (resp?.error || (resp?.statusCode && resp?.statusCode !== 200)) {
+        toast.error(resp?.message);
+      } else {
+        if (!resp || !resp?.id) {
+          toast.error("Something went wrong while creating new Task");
+          return;
+        }
+        toast.success("Task Created Successfully");
+        setopen(false);
+        form.reset();
+        mutate(["projectTasks", resp?.projectId]);
+      }
+    } catch (error) {
+      console.log({ error });
+      toast.error("Something went wrong! Failed to create task");
+    } finally {
+      setcreateLoading(false);
+    }
   }
 
+  const { data: AllProjects, isLoading: LoadingProjects } =
+    useWorkspaceProjects({ workspaceId: workspaceId! });
+  const { data: workspaceMembers, isLoading: LoadingMembers } =
+    useWorkspaceMembers({ workspaceId: workspaceId });
+
+  useEffect(() => {
+    // update form defaults
+    if (!LoadingMembers && workspaceMembers && !form.getValues("assigneeId")) {
+      form.setValue("assigneeId", workspaceMembers?.find((e) => !e)?.id!);
+    }
+    if (!LoadingProjects && AllProjects && !form.getValues("projectId")) {
+      form.setValue("projectId", AllProjects?.find((e) => !e)?.id!);
+    }
+  }, [LoadingMembers, LoadingProjects, AllProjects, workspaceMembers]);
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setopen}>
       <DialogTrigger>
         {children ?? (
           <MainButton>
@@ -123,8 +165,12 @@ const NewTaskmodal = ({
                     >
                       <Calendar
                         mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
+                        // selected={field.value}
+                        // onSelect={field.onChange}
+                        selected={
+                          field.value ? new Date(field.value) : undefined
+                        }
+                        onSelect={(date) => field.onChange(date)}
                         disabled={(date) => date < new Date()}
                         initialFocus
                       />
@@ -144,22 +190,21 @@ const NewTaskmodal = ({
                 <FormItem>
                   <FormLabel>Assignee</FormLabel>
                   <Select
+                    disabled={LoadingMembers}
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger disabled={LoadingMembers}>
                         <SelectValue placeholder="" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="m@example.com">
-                        m@example.com
-                      </SelectItem>
-                      <SelectItem value="m@google.com">m@google.com</SelectItem>
-                      <SelectItem value="m@support.com">
-                        m@support.com
-                      </SelectItem>
+                      {workspaceMembers?.map((member, index) => (
+                        <SelectItem key={index} value={member.id}>
+                          {member.email}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -175,11 +220,12 @@ const NewTaskmodal = ({
                 <FormItem>
                   <FormLabel>Status</FormLabel>
                   <Select
+                    disabled={LoadingMembers}
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger disabled={LoadingProjects}>
                         <SelectValue placeholder="" />
                       </SelectTrigger>
                     </FormControl>
@@ -208,20 +254,23 @@ const NewTaskmodal = ({
                   <FormLabel>Project</FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    defaultValue={
+                      field.value || AllProjects?.find((e) => !e)?.id
+                    }
                   >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Test project">
-                        <ProjectTitle title="Test project" />
-                      </SelectItem>
-                      <SelectItem value="Test project2">
-                        <ProjectTitle title="Test project2" />
-                      </SelectItem>
+                    <SelectContent
+                      defaultValue={AllProjects?.find((e) => !e)?.id}
+                    >
+                      {AllProjects?.map((project, index) => (
+                        <SelectItem key={index} value={project.id}>
+                          <ProjectTitle title={project?.name!} />
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -236,7 +285,14 @@ const NewTaskmodal = ({
                   Cancel
                 </Button>
               </DialogClose>
-              <MainButton type="submit"> Create Task</MainButton>
+              {createLoading ? (
+                <MainButton disabled type="submit">
+                  <Loader className="animate-spin h-4 w-4 transition-all" />{" "}
+                  Loading
+                </MainButton>
+              ) : (
+                <MainButton type="submit"> Create Task</MainButton>
+              )}
             </div>
           </form>
         </Form>

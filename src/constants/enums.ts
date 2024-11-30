@@ -8,8 +8,8 @@ export enum WORKSPACE_MEMBER_ROLE {
 
 export enum TaskEnum {
   BACKLOG = "BACKLOG",
-  IN_PROGRESS = "IN_PROGRESS",
-  IN_REVIEW = "IN_REVIEW",
+  IN_PROGRESS = "INPROGRESS",
+  IN_REVIEW = "INREVIEW",
   TODO = "TODO",
   DONE = "DONE",
 }

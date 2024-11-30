@@ -10,10 +10,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TasksFilters from "@/components/tasks/tasks-filters";
 import NewTaskmodal from "./modals/new-task-modal";
 import { useProjectTasks } from "@/hooks/tasks/use-project-tasks";
+import { useWorkspaceTasks } from "@/hooks/workspaces/use-workspace-tasks";
 
-const MyTasks = ({ projectId }: { projectId?: string }) => {
-  const { data: projectTasks, isLoading } = useProjectTasks({
-    projectId: projectId!,
+const MyTasks = ({
+  projectId,
+  workspaceId,
+}: {
+  projectId?: string; // not in home page
+  workspaceId?: string;
+}) => {
+  // const { data: projectTasks, isLoading } = useProjectTasks({
+  //   projectId: projectId!,
+  // });
+
+  // load all tasks in all projects in workspace
+  const { data: workspaceTasks, isLoading } = useWorkspaceTasks({
+    workspaceId: workspaceId!,
   });
 
   return (
@@ -28,7 +40,7 @@ const MyTasks = ({ projectId }: { projectId?: string }) => {
           </TabsList>
 
           {/** New Task Button */}
-          <NewTaskmodal />
+          <NewTaskmodal workspaceId={workspaceId!} />
         </div>
 
         {/** Separator */}
@@ -42,13 +54,16 @@ const MyTasks = ({ projectId }: { projectId?: string }) => {
         {/** Tabs Content */}
         {/** TOdo:: pass loaded tasks to each one of those */}
         <TabsContent value="table" className="w-full h-full">
-          <TasksTable />
+          <TasksTable workspaceTasks={workspaceTasks!} isLoading={isLoading} />
         </TabsContent>
         <TabsContent value="kanban" className="w-full h-full  ">
-          <TasksKanban />
+          <TasksKanban workspaceTasks={workspaceTasks!} isLoading={isLoading} />
         </TabsContent>
-        <TabsContent value="calendar" className="w-full h-full">
-          <TasksCalendar />
+        <TabsContent value="calendar" className="w-full h-full ">
+          <TasksCalendar
+            workspaceTasks={workspaceTasks!}
+            isLoading={isLoading}
+          />
         </TabsContent>
       </Tabs>
     </div>

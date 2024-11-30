@@ -58,7 +58,7 @@ const InfoCard = ({
               ) : (
                 <ChevronDown className=" " />
               )}
-              {incrementValue}%
+              <p className="text-sm">{incrementValue} more</p>
             </span>
             <p className="font-normal text-gray-500 text-sm">since Yesterday</p>
           </p>
