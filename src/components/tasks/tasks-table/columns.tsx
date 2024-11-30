@@ -1,11 +1,17 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, Trash } from "lucide-react";
+import {
+  MoreHorizontal,
+  Pencil,
+  SquareArrowOutUpRight,
+  Trash,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -107,14 +113,37 @@ export const TaskColumns: ColumnDef<Task>[] = [
     ),
     cell: ({ row }: any) => {
       const status = row.getValue("status") as TaskEnum;
+
+      let statusColor = "bg-gray-300";
+      switch (status) {
+        case TaskEnum.BACKLOG:
+          statusColor = "bg-red-500";
+          break;
+        case TaskEnum.IN_PROGRESS:
+          statusColor = "bg-yellow-500";
+          break;
+        case TaskEnum.IN_REVIEW:
+          statusColor = "bg-blue-500";
+          break;
+        case TaskEnum.TODO:
+          statusColor = "bg-purple-500";
+          break;
+        case TaskEnum.DONE:
+          statusColor = "bg-green-500";
+          break;
+      }
+
       return (
         <div className="flex items-center gap-2">
-          <StatusAvatar status={status} />
+          <div
+            className={`w-3 h-3 rounded-full  lowercase ${statusColor}`}
+            title={status}
+          ></div>
+          <span className="font-medium lowercase ">{status}</span>
         </div>
       );
     },
   },
-
   {
     id: "actions",
     cell: ({ row }) => {
@@ -128,9 +157,31 @@ export const TaskColumns: ColumnDef<Task>[] = [
               <span className="sr-only">Open menu</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[150px]">
-            <DropdownMenuItem className="cursor-pointer">Edit</DropdownMenuItem>
-            <DropdownMenuSeparator />
+          <DropdownMenuContent align="end" className="w-[170px]">
+            {/* <DropdownMenuItem className="cursor-pointer">Edit</DropdownMenuItem> */}
+
+            <DropdownMenuGroup className="gap-1 flex flex-col">
+              <DropdownMenuItem>
+                <SquareArrowOutUpRight className="" />
+                <span className="">Task Details</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem>
+                <SquareArrowOutUpRight className="h-4 w-4 ring-0 focus:ring-0" />
+                <span className="">Open Project</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem>
+                <Pencil className="h-4 w-4 ring-0 focus:ring-0" />
+                <span className="">Edit Task</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="h-[1px] bg-gray-200 " />
+
+              <DropdownMenuItem className="text-red-500 focus:bg-red-50 focus:text-red-500">
+                <Trash className="h-4 w-4 ring-0 focus:ring-0 " />
+                <span className="">Delete Task</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       );
