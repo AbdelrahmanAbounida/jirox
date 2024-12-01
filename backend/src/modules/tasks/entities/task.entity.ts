@@ -25,6 +25,9 @@ export class TaskEntity extends AbstractEnttiy<TaskEntity> {
   @Column({ type: 'timestamp', nullable: true })
   completedAt?: Date;
 
+  @Column({ type: 'varchar', nullable: true })
+  description?: string;
+
   @ManyToOne(() => WorkspaceMemberEntity, (member) => member.tasks, {
     cascade: true,
     onDelete: 'CASCADE',

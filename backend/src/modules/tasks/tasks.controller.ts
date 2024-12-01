@@ -35,7 +35,7 @@ export class TasksController {
 
   @Get(':id')
   async findTask(@Param('id') id: string) {
-    return this.tasksService.findOne(id);
+    return this.tasksService.findOneWithAssigneeEmail(id);
   }
 
   @Patch('/update/:id')

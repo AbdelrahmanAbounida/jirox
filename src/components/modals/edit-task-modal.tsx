@@ -84,7 +84,8 @@ const EditTaskModal = ({
         form.reset();
 
         console.log({ resp });
-        mutate([workspaceId, "workspaceTasks"]);
+        await mutate([workspaceId, "workspaceTasks"]);
+        await mutate(["projectTasks", currentTask?.projectId]);
       }
     } catch (error) {
       console.log({ error });

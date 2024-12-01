@@ -176,15 +176,15 @@ export class WorkspacesService {
     // Fetch assignees
     const assigneeIds = tasks
       .map((task) => task.assigneeId)
-      .filter((id): id is string => !!id)
-      .map((id) => new ObjectId(id));
+      .filter((id): id is string => !!id);
+    // .map((id) => new ObjectId(id));
 
-    const assignees = await this.memberRepository.find({
-      where: { _id: { $in: assigneeIds } as any },
+    const members = await this.memberRepository.find({
+      where: { userId: { $in: assigneeIds } as any },
     });
 
     const assigneeMap = new Map(
-      assignees.map((user) => [user._id.toString(), user.email]),
+      members.map((member) => [member.userId.toString(), member.email]),
     );
 
     // Enrich tasks with project names and assignee emails

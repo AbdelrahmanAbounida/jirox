@@ -34,7 +34,6 @@ export class TasksService {
     return this.entityManager.transaction(
       async (transactionalEntityManager) => {
         const task = this.taskRepository.create(createTaskDto);
-        console.log({ task });
         return transactionalEntityManager.save(task);
       },
     );
@@ -48,14 +47,24 @@ export class TasksService {
     });
   }
 
-  findAll() {
-    return `This action returns all tasks`;
-  }
-
   async findOne(id: string) {
-    return this.taskRepository.findOneBy({
+    return await this.taskRepository.findOneBy({
       _id: new ObjectId(id),
     });
+  }
+
+  async findOneWithAssigneeEmail(id: string) {
+    const task = await this.taskRepository.findOneBy({
+      _id: new ObjectId(id),
+    });
+    if (task) {
+      const assignee = await this.memberRepository.findOneBy({
+        userId: task?.assigneeId,
+      });
+      console.log({ assignee, id: task.assigneeId });
+
+      return { ...task, assigneeEmail: assignee?.email };
+    }
   }
 
   async update(
@@ -63,6 +72,8 @@ export class TasksService {
     updateTaskDto: UpdateTaskDto,
     user: CurrentUserProps,
   ) {
+    const { _id, id: asd, ...updateData } = updateTaskDto;
+
     return this.entityManager.transaction(
       async (transactionalEntityManager) => {
         // checlk if task exist
@@ -75,7 +86,8 @@ export class TasksService {
         await this.checkUserRole(exist, user);
 
         // update task using updateTaskDTO
-        const updatedTask = this.taskRepository.merge(exist, updateTaskDto);
+        const updatedTask = this.taskRepository.merge(exist, updateData);
+        console.log({ updatedTask });
         return transactionalEntityManager.save(updatedTask);
       },
     );

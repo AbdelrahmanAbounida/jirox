@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,6 +11,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Loader } from "lucide-react";
+import { Button } from "../ui/button";
 
 const ConfirmDeleteModal = ({
   children,
@@ -25,8 +27,10 @@ const ConfirmDeleteModal = ({
   description?: string;
   deleteButtonTitle?: string;
 }) => {
+  const [deleteLoading, setdeleteLoading] = useState(false);
+  const [open, setopen] = useState(false);
   return (
-    <AlertDialog>
+    <AlertDialog open={open} onOpenChange={setopen}>
       <AlertDialogTrigger>{children}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -41,12 +45,24 @@ const ConfirmDeleteModal = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel className="h-8">Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            className="bg-red-600/90 h-8 hover:bg-red-600 hover:opacity-95"
-            onClick={onDelete}
-          >
-            {deleteButtonTitle || title || "Delete"}
-          </AlertDialogAction>
+
+          {deleteLoading ? (
+            <Button variant={"destructive"} disabled>
+              <Loader className="w-h h-4 animate-spin" /> Deleting
+            </Button>
+          ) : (
+            <Button
+              className="bg-red-600/90 h-8 hover:bg-red-600 hover:opacity-95"
+              onClick={async () => {
+                setdeleteLoading(true);
+                await onDelete();
+                setdeleteLoading(false);
+                setopen(false);
+              }}
+            >
+              {deleteButtonTitle || title || "Delete"}
+            </Button>
+          )}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

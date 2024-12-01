@@ -12,9 +12,11 @@ export const createTaskSchema = z.object({
     .refine((date) => stripTime(date) >= stripTime(new Date()), {
       message: "Due Date cannot be in the past",
     }),
-  assigneeId: z.string().min(1, { message: "Assignee is required" }),
+  assigneeId: z.string().optional(),
   status: z.nativeEnum(TaskEnum),
   projectId: z.string().min(1, { message: "Project is reqiured" }),
 });
 
-export const editTaskSchema = createTaskSchema.extend({});
+export const editTaskSchema = createTaskSchema.extend({
+  description: z.string().optional(),
+});

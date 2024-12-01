@@ -47,6 +47,7 @@ import { toast } from "sonner";
 import { createTask } from "@/services/tasks/create-task";
 import { mutate } from "swr";
 import { TaskEnum } from "@/constants/enums";
+import { useRouter } from "next/navigation";
 
 const NewTaskmodal = ({
   children,
@@ -57,11 +58,12 @@ const NewTaskmodal = ({
 }) => {
   const [createLoading, setcreateLoading] = useState(false);
   const [open, setopen] = useState(false);
-
+  const router = useRouter();
   const form = useForm<z.infer<typeof createTaskSchema>>({
     resolver: zodResolver(createTaskSchema),
     defaultValues: {},
   });
+
   async function onSubmit(values: z.infer<typeof createTaskSchema>) {
     setcreateLoading(true);
 
@@ -77,7 +79,10 @@ const NewTaskmodal = ({
         toast.success("Task Created Successfully");
         setopen(false);
         form.reset();
-        mutate(["projectTasks", resp?.projectId]);
+        mutate("projectTasks");
+        mutate(["projectTasks", resp.projectId]);
+
+        router.refresh();
       }
     } catch (error) {
       console.log({ error });
@@ -89,6 +94,7 @@ const NewTaskmodal = ({
 
   const { data: AllProjects, isLoading: LoadingProjects } =
     useWorkspaceProjects({ workspaceId: workspaceId! });
+
   const { data: workspaceMembers, isLoading: LoadingMembers } =
     useWorkspaceMembers({ workspaceId: workspaceId });
 
@@ -201,7 +207,7 @@ const NewTaskmodal = ({
                     </FormControl>
                     <SelectContent>
                       {workspaceMembers?.map((member, index) => (
-                        <SelectItem key={index} value={member.id}>
+                        <SelectItem key={index} value={member.userId}>
                           {member.email}
                         </SelectItem>
                       ))}

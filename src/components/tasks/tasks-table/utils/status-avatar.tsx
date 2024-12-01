@@ -8,15 +8,7 @@ import {
   RefreshCcw,
   FileQuestion,
 } from "lucide-react";
-import { DataTableColumnHeader } from "./column-header";
-
-export enum TaskEnum {
-  BACKLOG = "BACKLOG",
-  IN_PROGRESS = "INPROGRESS",
-  IN_REVIEW = "INREVIEW",
-  TODO = "TODO",
-  DONE = "DONE",
-}
+import { TaskEnum } from "@/constants/enums";
 
 // Mapping of status to avatar configurations
 const STATUS_CONFIG = {
@@ -24,17 +16,17 @@ const STATUS_CONFIG = {
     icon: FileQuestion,
     className: "bg-gray-50 text-gray-600",
   },
-  [TaskEnum.IN_PROGRESS]: {
+  [TaskEnum.INPROGRESS]: {
     icon: RefreshCcw,
     className: "bg-blue-50 text-blue-600",
   },
-  [TaskEnum.IN_REVIEW]: {
+  [TaskEnum.INREVIEW]: {
     icon: Clock,
     className: "bg-yellow-50 text-yellow-600",
   },
   [TaskEnum.TODO]: {
     icon: ListTodo,
-    className: "bg-purple-50 text-purple-600",
+    className: "bg-purple-100 text-purple-600",
   },
   [TaskEnum.DONE]: {
     icon: CheckCircle2,
@@ -62,7 +54,7 @@ export const StatusAvatar: React.FC<StatusAvatarProps> = ({
   return (
     <div
       className={cn(
-        "w-auto p-2 px-4 bg-transparent rounded-full font-medium text-xs",
+        "w-auto p-1 px-5 bg-transparent rounded-full font-medium text-xs",
         config.className,
         className
       )}

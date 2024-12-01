@@ -21,6 +21,12 @@ import { Task, TaskWithWorkspaceId } from "@/types/task";
 import { TaskEnum } from "@/constants/enums";
 import ProjectTitle from "../project-title";
 import EditTaskModal from "@/components/modals/edit-task-modal";
+import Link from "next/link";
+import DuedateViewer from "./utils/duedate-viewer";
+import AssigneeViewer from "./utils/assignee-viewer";
+import ConfirmDeleteModal from "@/components/modals/confirm-delete-modal";
+import { handleDeleteTask } from "@/utils/task-utils";
+import { useRouter } from "next/navigation";
 
 export const TaskColumns: ColumnDef<TaskWithWorkspaceId>[] = [
   {
@@ -58,16 +64,7 @@ export const TaskColumns: ColumnDef<TaskWithWorkspaceId>[] = [
     ),
     cell: ({ row }) => {
       const assignee = row.getValue("assigneeEmail") as string;
-      return (
-        <div className=" min-w-[210px] rounded-lg p-3 flex justify-center items-center">
-          <div className="bg-blue-600 text-white flex items-center justify-center font-semibold rounded-md w-5 h-5 mr-2">
-            <span className="capitalize ">{assignee && assignee[0]}</span>
-          </div>
-          <div className="flex flex-col gap-1 items-start">
-            <p className="text-gray-700 text-sm">{assignee}</p>
-          </div>
-        </div>
-      );
+      return <AssigneeViewer assignee={assignee} />;
     },
   },
   {
@@ -76,29 +73,8 @@ export const TaskColumns: ColumnDef<TaskWithWorkspaceId>[] = [
       <DataTableColumnHeader column={column} title="Due Date" />
     ),
     cell: ({ row }) => {
-      const dueDate = new Date(row.getValue("dueDate"));
-      const today = new Date();
-      const differenceInDays = Math.ceil(
-        (dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
-      );
-
-      // Determine the color based on how near/far the due date is
-      let textColor = "text-black";
-      if (differenceInDays < 0) {
-        textColor = "text-red-500";
-      } else if (differenceInDays <= 3) {
-        textColor = "text-yellow-500";
-      } else if (differenceInDays <= 7) {
-        textColor = "text-blue-500";
-      } else {
-        textColor = "text-green-500";
-      }
-
-      return (
-        <div className={`text-start font-medium ${textColor}`}>
-          {dueDate.toISOString().split("T")[0]}
-        </div>
-      );
+      const date = row.getValue("dueDate") as string;
+      return <DuedateViewer date={date} />;
     },
   },
   {
@@ -143,6 +119,7 @@ export const TaskColumns: ColumnDef<TaskWithWorkspaceId>[] = [
     id: "actions",
     cell: ({ row }) => {
       const task = row.original;
+      const router = useRouter();
 
       return (
         <DropdownMenu>
@@ -153,29 +130,55 @@ export const TaskColumns: ColumnDef<TaskWithWorkspaceId>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-[170px]">
-            <DropdownMenuGroup className="gap-1 flex flex-col">
+            <DropdownMenuGroup className="gap-1 flex flex-col ">
               <DropdownMenuItem>
-                <SquareArrowOutUpRight className="" />
-                <span className="">Task Details</span>
+                <Link
+                  href={`/workspaces/${task.workspaceId}/projects/${task.projectId}/tasks/${task.id}`}
+                  target="_blank"
+                  className="flex items-center gap-2"
+                >
+                  <SquareArrowOutUpRight className="h-4 w-4" />
+                  <span className="">Task Details</span>
+                </Link>
               </DropdownMenuItem>
 
               <DropdownMenuItem>
-                <SquareArrowOutUpRight className="h-4 w-4 ring-0 focus:ring-0" />
-                <span className="">Open Project</span>
+                <Link
+                  className="flex items-center gap-2"
+                  href={`/workspaces/${task.workspaceId}/projects/${task.projectId}`}
+                  target="_blank"
+                >
+                  <SquareArrowOutUpRight className="h-4 w-4 ring-0 focus:ring-0" />
+                  <span className="">Open Project</span>
+                </Link>
               </DropdownMenuItem>
 
               <EditTaskModal taskId={task.id} workspaceId={task.workspaceId}>
-                <div className="flex items-center gap-2 hover:bg-slate-100 p-[5px] rounded-md ">
+                <div className="flex items-center gap-2 hover:bg-slate-100 p-[5px] rounded-md pl-2 ">
                   <Pencil className="h-4 w-4 ring-0 focus:ring-0 mr-1" />
                   <span className="text-sm">Edit Task</span>
                 </div>
               </EditTaskModal>
               <DropdownMenuSeparator className="h-[1px] bg-gray-200 " />
 
-              <DropdownMenuItem className="text-red-500 focus:bg-red-50 focus:text-red-500">
-                <Trash className="h-4 w-4 ring-0 focus:ring-0 " />
-                <span className="">Delete Task</span>
-              </DropdownMenuItem>
+              <ConfirmDeleteModal
+                onDelete={async () => {
+                  await handleDeleteTask({
+                    task,
+                    workspaceId: task.workspaceId,
+                    router,
+                  });
+                }}
+              >
+                <div className="flex items-center gap-2 text-sm p-1 pl-2 text-red-500 hover:bg-red-50 hover:text-red-600">
+                  <Trash className="h-4 w-4 ring-0 focus:ring-0 " />
+                  <span className="">Delete Task</span>
+                </div>
+              </ConfirmDeleteModal>
+
+              {/* <DropdownMenuItem className="text-red-500 focus:bg-red-50 focus:text-red-500">
+                
+              </DropdownMenuItem> */}
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
