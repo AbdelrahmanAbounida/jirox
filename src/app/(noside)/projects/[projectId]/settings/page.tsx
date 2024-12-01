@@ -36,6 +36,7 @@ import { deleteProject } from "@/services/projects/delete-project";
 import { getEnumNameByColor, mapColorToEnum } from "@/utils/project-utils";
 import { mutate } from "swr";
 import { ProjectColor } from "@/constants/enums";
+import LoadingPage from "@/app/(dashboard)/workspaces/[workspaceId]/loading";
 
 interface PageProps {
   params: {
@@ -286,32 +287,34 @@ const ProjectSettings = ({ params }: PageProps) => {
         <SettingsSkeleton />
       )}
 
-      <div className="w-auto min-w-[550px] bg-white rounded-md shadow-md p-7 ">
-        <div className="flex flex-col w-full">
-          <p className="font-medium text-md">Danger Zone</p>
-          <p className="text-gray-500 text-sm">
-            Deleting a Project is irreversible and will remove all associated
-            data.
-          </p>
+      {!isLoading && (
+        <div className="w-auto min-w-[550px] bg-white rounded-md shadow-md p-7 ">
+          <div className="flex flex-col w-full">
+            <p className="font-medium text-md">Danger Zone</p>
+            <p className="text-gray-500 text-sm">
+              Deleting a Project is irreversible and will remove all associated
+              data.
+            </p>
+          </div>
+          <div className="flex w-full justify-end mt-7">
+            {/** TODO:: this is confirm modal */}
+            <ConfirmDeleteModal
+              deleteButtonTitle="Delete Project"
+              onDelete={handleDeleteProject}
+            >
+              {deleteLoading ? (
+                <MainButton className="bg-red-500" disabled>
+                  <Loader className="animate-spin w-4 h-4" /> Loading
+                </MainButton>
+              ) : (
+                <Button variant={"destructive"} className="h-8">
+                  Delete Project
+                </Button>
+              )}
+            </ConfirmDeleteModal>
+          </div>
         </div>
-        <div className="flex w-full justify-end mt-7">
-          {/** TODO:: this is confirm modal */}
-          <ConfirmDeleteModal
-            deleteButtonTitle="Delete Project"
-            onDelete={handleDeleteProject}
-          >
-            {deleteLoading ? (
-              <MainButton className="bg-red-500" disabled>
-                <Loader className="animate-spin w-4 h-4" /> Loading
-              </MainButton>
-            ) : (
-              <Button variant={"destructive"} className="h-8">
-                Delete Project
-              </Button>
-            )}
-          </ConfirmDeleteModal>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TaskEntity } from './entities/task.entity';
 import { ProjectEntity } from '../projects/entities/project.entity';
 import { WorkspaceMemberEntity } from '../members/entities/member.entity';
+import { KanbanService } from './kanban.services';
+import { ColumnEntity } from './entities/column.entity';
 
 @Module({
   imports: [
@@ -12,9 +14,10 @@ import { WorkspaceMemberEntity } from '../members/entities/member.entity';
       TaskEntity,
       WorkspaceMemberEntity,
       ProjectEntity,
+      ColumnEntity,
     ]),
   ],
   controllers: [TasksController],
-  providers: [TasksService],
+  providers: [TasksService, KanbanService],
 })
 export class TasksModule {}

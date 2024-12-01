@@ -9,6 +9,8 @@ import { ProjectsService } from '../projects/projects.service';
 import { ProjectEntity } from '../projects/entities/project.entity';
 import { WorkspaceMemberEntity } from '../members/entities/member.entity';
 import { TaskEntity } from '../tasks/entities/task.entity';
+import { KanbanService } from '../tasks/kanban.services';
+import { ColumnEntity } from '../tasks/entities/column.entity';
 
 @Module({
   imports: [
@@ -18,9 +20,10 @@ import { TaskEntity } from '../tasks/entities/task.entity';
       ProjectEntity,
       TaskEntity,
       WorkspaceMemberEntity,
+      ColumnEntity,
     ]),
   ],
   controllers: [WorkspacesController],
-  providers: [WorkspacesService, AwsS3Service, ProjectsService],
+  providers: [WorkspacesService, AwsS3Service, ProjectsService, KanbanService],
 })
 export class WorkspacesModule {}

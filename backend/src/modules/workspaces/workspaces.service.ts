@@ -22,6 +22,8 @@ import { CurrentUserProps } from 'src/common/types/current-user';
 import { TaskEntity } from '../tasks/entities/task.entity';
 import { ProjectEntity } from '../projects/entities/project.entity';
 import { In } from 'typeorm';
+import { TasksService } from '../tasks/tasks.service';
+import { KanbanService } from '../tasks/kanban.services';
 
 @Injectable()
 export class WorkspacesService {
@@ -39,6 +41,7 @@ export class WorkspacesService {
     private readonly memberRepository: Repository<WorkspaceMemberEntity>,
 
     private readonly projectService: ProjectsService,
+    private readonly kanbanService: KanbanService,
     private readonly entityManager: EntityManager,
     private readonly s3Service: AwsS3Service,
   ) {}
@@ -104,7 +107,7 @@ export class WorkspacesService {
           const savedWorkspace =
             await transactionalEntityManager.save(workspace);
 
-          // create defaule project
+          // create default project with default column
           await this.projectService.create(
             {
               name: 'default',
@@ -113,6 +116,7 @@ export class WorkspacesService {
             },
             user,
           );
+
           // add this owner as member of this workspace
           const newMember = this.memberRepository.create({
             active: true,

@@ -23,7 +23,6 @@ import { BoardColumn } from "./column";
 import { TaskCard } from "./task-card";
 import { ColumnWithTasks } from "@/schemas/drag-schemas";
 import { hasDraggableData } from "./utils/drag-utils";
-import EmptyColumn from "./utils/empty-col";
 
 import { toast } from "sonner";
 import { ReloadIcon } from "@radix-ui/react-icons";
@@ -100,11 +99,6 @@ export function KanbanBoard({
               tasks={col?.tasks} // .filter((task) => task.columnId === col.id)
             />
           ))}
-
-          {/** Add New Cols */}
-          <div className=" w-[350px] max-w-full">
-            {<EmptyColumn newPos={cols.length} boardId={boardId} />}
-          </div>
         </SortableContext>
       </BoardContainer>
 

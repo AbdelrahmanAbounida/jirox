@@ -15,6 +15,7 @@ import { ObjectId } from 'mongodb';
 import { WorkspaceMemberEntity } from '../members/entities/member.entity';
 import { WORKSPACE_MEMBER_ROLE } from '../members/enums/member.enum';
 import { AwsS3Service } from 'src/common/services/aws/services/aws.s3.service';
+import { KanbanService } from '../tasks/kanban.services';
 
 @Injectable()
 export class ProjectsService {
@@ -27,6 +28,7 @@ export class ProjectsService {
 
     private readonly entityManager: EntityManager,
     private readonly s3Service: AwsS3Service,
+    private readonly kanbanService: KanbanService,
   ) {}
   async create(createProjectDto: CreateProjectDto, user: CurrentUserProps) {
     // check if project with same name exist
@@ -41,7 +43,7 @@ export class ProjectsService {
     }
 
     // TODO:: not all user should be able to create a project
-    const newProject = await this.entityManager.transaction(
+    return await this.entityManager.transaction(
       async (transactionalEntityManager) => {
         const newProject = this.projectRepository.create({
           name: createProjectDto.name,
@@ -49,11 +51,18 @@ export class ProjectsService {
           workspaceId: createProjectDto.workspaceId,
           color: createProjectDto.color,
         });
-        return await transactionalEntityManager.save(newProject);
+
+        const savedProject = await transactionalEntityManager.save(newProject);
+
+        // default cols for this project
+        const cols = await this.kanbanService.createDefaultCols({
+          projectId: newProject.id,
+        });
+        await transactionalEntityManager.save(cols);
+
+        return savedProject;
       },
     );
-
-    return newProject;
   }
 
   async findAll({ workspaceId }: { workspaceId: string }) {

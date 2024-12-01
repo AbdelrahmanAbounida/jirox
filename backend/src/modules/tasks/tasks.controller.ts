@@ -24,7 +24,6 @@ export class TasksController {
 
   @Post('/create')
   async createTask(@Body() createTaskDto: CreateTaskDto) {
-    console.log({ createTaskDto });
     return this.tasksService.create(createTaskDto);
   }
 
@@ -54,4 +53,7 @@ export class TasksController {
   ) {
     return this.tasksService.remove(id, user);
   }
+
+  /** ********* Kanbna Routes ************* */
+  /** update col , update task position */
 }
