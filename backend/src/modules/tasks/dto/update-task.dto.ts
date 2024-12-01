@@ -1,6 +1,7 @@
 import { PartialType } from '@nestjs/swagger';
 import { CreateTaskDto } from './create-task.dto';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { TaskEnum } from '../enums/task.enum';
 
 export class UpdateTaskDto extends PartialType(CreateTaskDto) {
   @IsOptional()
@@ -16,4 +17,7 @@ export class UpdateTaskPositionDto {
 
   @IsNumber()
   newPosition: number;
+
+  @IsEnum(TaskEnum)
+  newStatus: TaskEnum; // new status means new col
 }

@@ -1,5 +1,4 @@
-import { getWorkspaceTasks } from "@/services/workspaces/get-workspace-tasks";
-import { getAllWorkspaces } from "@/services/workspaces/get-workspaces";
+import { getWorkspaceTasks } from "@/services/tasks/get-tasks";
 import useSWR from "swr";
 
 const fetcher = async ([workspaceId, key]: [string, string]) => {

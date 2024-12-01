@@ -9,3 +9,16 @@ export const getProjectTasks = async ({ projectId }: { projectId: string }) => {
 
   return tasks;
 };
+
+export const getWorkspaceTasks = async ({
+  workspaceId,
+}: {
+  workspaceId: string;
+}) => {
+  const workspaceTasks: Task[] = await apiClient({
+    endpoint: `/workspaces/tasks/${workspaceId}`,
+    method: "GET",
+  });
+
+  return workspaceTasks;
+};

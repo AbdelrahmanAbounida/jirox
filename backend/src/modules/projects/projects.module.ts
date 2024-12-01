@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ProjectsService } from './projects.service';
 import { ProjectsController } from './projects.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -7,7 +7,7 @@ import { TaskEntity } from '../tasks/entities/task.entity';
 import { WorkspaceMemberEntity } from '../members/entities/member.entity';
 import { AwsS3Service } from 'src/common/services/aws/services/aws.s3.service';
 import { KanbanService } from '../tasks/kanban.services';
-import { ColumnEntity } from '../tasks/entities/column.entity';
+import { TasksModule } from '../tasks/tasks.module';
 
 @Module({
   imports: [
@@ -15,8 +15,8 @@ import { ColumnEntity } from '../tasks/entities/column.entity';
       ProjectEntity,
       TaskEntity,
       WorkspaceMemberEntity,
-      ColumnEntity,
     ]),
+    forwardRef(() => TasksModule),
   ],
   controllers: [ProjectsController],
   providers: [AwsS3Service, ProjectsService, KanbanService],

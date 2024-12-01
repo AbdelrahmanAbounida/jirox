@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import {
@@ -21,34 +21,37 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 import { BoardColumn } from "./column";
 import { TaskCard } from "./task-card";
-import { ColumnWithTasks } from "@/schemas/drag-schemas";
+import { ColumnWithTasks } from "@/types/drag";
 import { hasDraggableData } from "./utils/drag-utils";
 
 import { toast } from "sonner";
 import { ReloadIcon } from "@radix-ui/react-icons";
-import { Task } from "./interfaces";
-import { useCurrentBoard } from "@/hooks/use-current-board";
-
-// import { Task } from "@prisma/client";
-// import { updateColsPositions } from "@/actions/col/update-cols";
-// import { updateColTaskPositions } from "@/actions/task/update-task";
-// import { useCurrentBoard } from "@/hooks/drag-board/use-current-board";
+import { Task } from "@/types/task";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useBoard } from "@/hooks/drag-board/use-board";
+import { TaskEnum } from "@/constants/enums";
 
 export type ColumnId = string;
 
+/** >> This is the entry point */
 export function KanbanBoard({
-  boardColumns,
-  boardId,
+  workspaceId,
+  projectId,
 }: {
-  boardColumns: ColumnWithTasks[];
-  boardId: string;
+  workspaceId: string;
+  projectId?: string;
 }) {
-  // const [columns, setColumns] = useState<ColumnWithTasks[]>(boardColumns);
-  const { cols, setcolTasks, setCols } = useCurrentBoard();
+  const {
+    columns: cols,
+    isLoading,
+    mutate,
+  } = useBoard({
+    projectId,
+    workspaceId,
+  });
 
-  const pickedUpTaskColumn = useRef<ColumnId | null>(null);
-  const columnsId = useMemo(() => cols.map((col: any) => col.id), [cols]);
-  // const [activetasks, setActiveTasks] = useState<Task[]>([]);
+  const columnsId = useMemo(() => cols.map((col) => col.id), [cols]);
+
   const [activeColumn, setActiveColumn] = useState<ColumnWithTasks | null>(
     null
   );
@@ -62,51 +65,32 @@ export function KanbanBoard({
         distance: 8, // to give time for click event if so
       },
     })
-    // useSensor(KeyboardSensor, {
-    //   coordinateGetter: coordinateGetter,
-    // })
   );
-  useEffect(() => {
-    setCols(boardColumns);
-  }, [boardColumns]);
 
-  // const { isGlobalLoading } = useGlobalLoading();
-  const isGlobalLoading = false;
-
-  return isGlobalLoading ? (
-    <div className="h-full  w-full flex flex-col text-slate-300 text-2xl opacity-100  items-center justify-center">
-      <ReloadIcon className="animate-spin h-20 w-20 text-white" fill="white" />
-      Copying Board
-    </div>
+  return isLoading ? (
+    <KanbanSkeleton />
   ) : (
     <DndContext
-      //   accessibility={{
-      //     announcements,
-      //   }}
       sensors={sensors}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       onDragOver={onDragOver}
     >
-      {/** main board */}
+      {/* main board */}
       <BoardContainer>
-        <SortableContext items={columnsId}>
-          {/** List of columns */}
-          {cols.map((col: any) => (
-            <BoardColumn
-              key={col.id}
-              column={col}
-              tasks={col?.tasks} // .filter((task) => task.columnId === col.id)
-            />
+        <SortableContext items={columnsId!}>
+          {/* List of columns */}
+          {cols?.map((col: any) => (
+            <BoardColumn key={col.id} column={col} tasks={col?.tasks} />
           ))}
         </SortableContext>
       </BoardContainer>
 
-      {/** overlay */}
+      {/* overlay */}
       {"document" in window &&
         createPortal(
           <DragOverlay>
-            {/** 1- for dragging column  */}
+            {/* 1- for dragging column */}
             {activeColumn && (
               <BoardColumn
                 isOverlay
@@ -114,7 +98,7 @@ export function KanbanBoard({
                 tasks={activeColumn.tasks}
               />
             )}
-            {/** 2- for dragging task */}
+            {/* 2- for dragging task */}
             {activeTask && (
               <TaskCard task={activeTask} column={activeColumn!} isOverlay />
             )}
@@ -143,6 +127,7 @@ export function KanbanBoard({
 
   // for col drag
   async function onDragEnd(event: DragEndEvent) {
+    // TODO:: check col workspace positoin and project position
     setActiveColumn(null);
     setActiveTask(null);
 
@@ -160,12 +145,23 @@ export function KanbanBoard({
     const isActiveAColumn = activeData?.type === "Column";
     if (!isActiveAColumn) return;
 
-    const activeColumnIndex = cols.findIndex((col) => col.id === activeId);
-    const overColumnIndex = cols.findIndex((col) => col.id === overId);
-    const newCols = arrayMove(cols, activeColumnIndex, overColumnIndex);
-    setCols(newCols);
+    const activeColumnIndex = cols?.findIndex((col) => col.id === activeId);
+    const overColumnIndex = cols?.findIndex((col) => col.id === overId);
+    const newCols = arrayMove(cols!, activeColumnIndex!, overColumnIndex!);
 
-    // await updateColsPositions({ newCols: newCols, boardId });
+    //optimistic update >>> TODO:: check logic of updating both global and project pos
+    mutate(
+      (prevData: any) => ({
+        ...prevData,
+        columns: newCols,
+      }),
+      {
+        optimisticData: newCols.map((col) => col.tasks).flat(),
+        populateCache: true,
+        revalidate: false,
+        rollbackOnError: true,
+      }
+    );
     toast.success("Columns swapped successfully");
   }
 
@@ -194,7 +190,9 @@ export function KanbanBoard({
 
       // get active cols tasks
       if (activeTask && overTask && activeTask.columnId === overTask.columnId) {
-        const activeColumn = cols.find((col) => col.id === activeTask.columnId);
+        const activeColumn = cols?.find(
+          (col) => col.id === activeTask.columnId
+        );
 
         const activeIndex = activeColumn?.tasks.findIndex(
           (task: any) => task.id == activeTask.id
@@ -208,14 +206,22 @@ export function KanbanBoard({
           // Im dropping a Task over another Task (same col)
           const oldTasks = activeColumn?.tasks;
           const newTasks = arrayMove(oldTasks!, activeIndex!, overIndex!);
-          setcolTasks(newTasks, activeColumn!);
 
-          // 1- delete task from active col
-          // await updateColTaskPositions({
-          //   newColTasks: newTasks,
-          //   columnId: activeColumn?.id!,
-          //   updateType: "active",
-          // });
+          // TODO:: update col hook either workspace pos or global pos
+          // setcolTasks(newTasks, activeColumn!);
+
+          // mutate(
+          //   (prevData: any) => ({
+          //     ...prevData,
+          //     columns: newCols,
+          //   }),
+          //   {
+          //     optimisticData: newCols,
+          //     populateCache: true ,
+          //     revalidate: false,
+          //     rollbackOnError: true
+          //   }
+          // );
         }
       }
       // Im dropping a Task over another Task (different column)
@@ -226,10 +232,10 @@ export function KanbanBoard({
       ) {
         if (isActiveTask && overTask) {
           // switch cols
-          const activeColumn = cols.find(
+          const activeColumn = cols?.find(
             (col) => col.id === activeTask.columnId
           );
-          const overColumn = cols.find((col) => col.id === overTask.columnId);
+          const overColumn = cols?.find((col) => col.id === overTask.columnId);
 
           // switch tasks
           const oldActiveTasks = activeColumn?.tasks;
@@ -246,25 +252,24 @@ export function KanbanBoard({
           if (activeIndex! > -1 && overIndex! > -1) {
             oldActiveTasks?.splice(activeIndex!, 1);
             oldOverTasks?.splice(overIndex!, 0, activeTask);
-
             activeTask.columnId = overTask.columnId;
 
-            setcolTasks(oldActiveTasks!, activeColumn!);
-            setcolTasks(oldOverTasks!, overColumn!);
+            // TODO:: update status with hoo k
+            // mutate(
+            //   (prevData: any) => ({
+            //     ...prevData,
+            //     columns: newCols,
+            //   }),
+            //   {
+            //     optimisticData: newCols,
+            //     populateCache: true ,
+            //     revalidate: false,
+            //     rollbackOnError: true
+            //   }
+            // );
 
-            // update active col tasks
-            // await updateColTaskPositions({
-            //   newColTasks: oldActiveTasks!,
-            //   columnId: activeColumn?.id!,
-            //   updateType: "active",
-            // });
-
-            // 2- add task to new over col
-            // await updateColTaskPositions({
-            //   newColTasks: oldOverTasks!,
-            //   columnId: overColumn?.id!,
-            //   updateType: "over",
-            // });
+            // setcolTasks(oldActiveTasks!, activeColumn!);
+            // setcolTasks(oldOverTasks!, overColumn!);
           }
         }
       }
@@ -300,3 +305,13 @@ export function BoardContainer({ children }: { children: React.ReactNode }) {
 }
 
 export default KanbanBoard;
+const KanbanSkeleton = () => (
+  <div className="h-full w-full flex flex-col items-center justify-center space-y-4">
+    <Skeleton className="w-full h-12 rounded-lg" />
+    <div className="w-full flex space-x-4">
+      <Skeleton className="w-32 h-48 rounded-lg" />
+      <Skeleton className="w-32 h-48 rounded-lg" />
+      <Skeleton className="w-32 h-48 rounded-lg" />
+    </div>
+  </div>
+);

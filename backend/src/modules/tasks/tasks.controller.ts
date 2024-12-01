@@ -13,6 +13,7 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { CurrentUser } from '../auth/decorator/current-user.decorator';
 import { CurrentUserProps } from 'src/common/types/current-user';
 import { ApiTags } from '@nestjs/swagger';
+import { KanbanService } from './kanban.services';
 
 @Controller({
   path: 'tasks',
@@ -20,7 +21,10 @@ import { ApiTags } from '@nestjs/swagger';
 })
 @ApiTags('Tasks')
 export class TasksController {
-  constructor(private readonly tasksService: TasksService) {}
+  constructor(
+    private readonly tasksService: TasksService,
+    private readonly kanbanService: KanbanService,
+  ) {}
 
   @Post('/create')
   async createTask(@Body() createTaskDto: CreateTaskDto) {
@@ -55,5 +59,6 @@ export class TasksController {
   }
 
   /** ********* Kanbna Routes ************* */
-  /** update col , update task position */
+
+  // TODO:: update col tasks (in project or workspace)
 }

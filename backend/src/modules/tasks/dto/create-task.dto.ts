@@ -2,6 +2,7 @@ import {
   IsDate,
   IsDateString,
   IsEnum,
+  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -28,4 +29,7 @@ export class CreateTaskDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @IsNumber()
+  position: number; // load number of column tasks with this status
 }

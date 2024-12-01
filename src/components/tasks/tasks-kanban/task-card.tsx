@@ -4,11 +4,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cva } from "class-variance-authority";
 import { Badge } from "@/components/ui/badge";
-import {
-  ColumnWithTasks,
-  TaskCardProps,
-  TaskDragData,
-} from "@/schemas/drag-schemas";
+import { ColumnWithTasks, TaskCardProps, TaskDragData } from "@/types/drag";
 import TaskDropdown from "./utils/task-dropdown";
 import { Avatar } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
@@ -67,7 +63,7 @@ export function TaskCard({
       }}
     >
       <CardHeader className=" justify-between items-center flex flex-row p-0 relative">
-        <p className="text-sm text-left   ">{task.title}</p>
+        <p className="text-sm text-left   ">{task.name}</p>
         <div
           onMouseDown={(event) => {
             event.stopPropagation();

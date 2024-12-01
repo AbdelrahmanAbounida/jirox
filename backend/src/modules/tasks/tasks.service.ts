@@ -13,8 +13,6 @@ import { WorkspaceMemberEntity } from '../members/entities/member.entity';
 import { CurrentUserProps } from 'src/common/types/current-user';
 import { WORKSPACE_MEMBER_ROLE } from '../members/enums/member.enum';
 import { ProjectEntity } from '../projects/entities/project.entity';
-import { ColumnEntity } from './entities/column.entity';
-import { formatTaskName } from './utils/col-utils';
 
 @Injectable()
 export class TasksService {
@@ -25,9 +23,6 @@ export class TasksService {
     @InjectRepository(ProjectEntity)
     private readonly projectRepository: Repository<ProjectEntity>,
 
-    @InjectRepository(ColumnEntity)
-    private readonly columnRepository: Repository<ColumnEntity>,
-
     @InjectRepository(WorkspaceMemberEntity)
     private readonly memberRepository: Repository<WorkspaceMemberEntity>,
 
@@ -37,19 +32,10 @@ export class TasksService {
   async create(createTaskDto: CreateTaskDto) {
     // create task
 
-    // TODO:: add this task to column according to its name
-    const col = await this.columnRepository.findOneBy({
-      name: formatTaskName({ status: createTaskDto.status }),
-    });
-    if (!col) {
-      throw new NotFoundException('No Column found with this ID');
-    }
-
     return this.entityManager.transaction(
       async (transactionalEntityManager) => {
         const task = this.taskRepository.create({
           ...createTaskDto,
-          columnId: col.id,
         });
         return transactionalEntityManager.save(task);
       },

@@ -10,7 +10,6 @@ import {
 import { TaskEnum } from '../enums/task.enum';
 import { ProjectEntity } from 'src/modules/projects/entities/project.entity';
 import { WorkspaceMemberEntity } from 'src/modules/members/entities/member.entity';
-import { ColumnEntity } from './column.entity';
 
 @Entity('tasks')
 @Index(['projectId'])
@@ -37,18 +36,13 @@ export class TaskEntity extends AbstractEnttiy<TaskEntity> {
   description?: string;
 
   // kanban
-  @Column({ type: 'varchar' })
-  columnId: string;
+  @Column({ type: 'number', nullable: false })
+  position: number; // project
 
   @Column({ type: 'number' })
-  position: number;
-
-  @ManyToOne(() => ColumnEntity, (col) => col.tasks)
-  @JoinColumn({ name: 'columnId' })
-  column: ColumnEntity;
+  wokrspacePosition: number; // wokrspace Position
 
   // relations
-
   @ManyToOne(() => WorkspaceMemberEntity, (member) => member.tasks, {
     cascade: true,
     onDelete: 'CASCADE',

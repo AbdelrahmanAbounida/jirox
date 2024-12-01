@@ -13,7 +13,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { WorkspaceEntity } from './entities/workspace.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { AwsS3Service } from 'src/common/services/aws/services/aws.s3.service';
-import { User } from '../users/entities/user.entity';
 import { ProjectsService } from '../projects/projects.service';
 import { WorkspaceMemberEntity } from '../members/entities/member.entity';
 import { WORKSPACE_MEMBER_ROLE } from '../members/enums/member.enum';
@@ -21,9 +20,6 @@ import { ObjectId } from 'mongodb';
 import { CurrentUserProps } from 'src/common/types/current-user';
 import { TaskEntity } from '../tasks/entities/task.entity';
 import { ProjectEntity } from '../projects/entities/project.entity';
-import { In } from 'typeorm';
-import { TasksService } from '../tasks/tasks.service';
-import { KanbanService } from '../tasks/kanban.services';
 
 @Injectable()
 export class WorkspacesService {
@@ -41,7 +37,6 @@ export class WorkspacesService {
     private readonly memberRepository: Repository<WorkspaceMemberEntity>,
 
     private readonly projectService: ProjectsService,
-    private readonly kanbanService: KanbanService,
     private readonly entityManager: EntityManager,
     private readonly s3Service: AwsS3Service,
   ) {}
@@ -176,6 +171,8 @@ export class WorkspacesService {
     const tasks = await this.taskRepository.find({
       where: { projectId: { $in: projectIds } as any },
     });
+
+    // fetch Columns
 
     // Fetch assignees
     const assigneeIds = tasks

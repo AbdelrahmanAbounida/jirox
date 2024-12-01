@@ -44,7 +44,7 @@ export class ProjectsController {
 
   @Get('/all/:workspaceId')
   async findAllWorkspaceProjects(@Param('workspaceId') workspaceId: string) {
-    return this.projectsService.findAll({ workspaceId });
+    return this.projectsService.findWorkspaceProjects({ workspaceId });
   }
 
   @Get('/:id')

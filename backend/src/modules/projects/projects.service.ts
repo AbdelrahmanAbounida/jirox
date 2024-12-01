@@ -1,6 +1,8 @@
 import {
   ConflictException,
   ForbiddenException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -9,7 +11,6 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProjectEntity } from './entities/project.entity';
 import { EntityManager, Repository } from 'typeorm';
-import { User } from '../users/entities/user.entity';
 import { CurrentUserProps } from 'src/common/types/current-user';
 import { ObjectId } from 'mongodb';
 import { WorkspaceMemberEntity } from '../members/entities/member.entity';
@@ -28,6 +29,8 @@ export class ProjectsService {
 
     private readonly entityManager: EntityManager,
     private readonly s3Service: AwsS3Service,
+
+    @Inject(forwardRef(() => KanbanService))
     private readonly kanbanService: KanbanService,
   ) {}
   async create(createProjectDto: CreateProjectDto, user: CurrentUserProps) {
@@ -51,21 +54,12 @@ export class ProjectsService {
           workspaceId: createProjectDto.workspaceId,
           color: createProjectDto.color,
         });
-
-        const savedProject = await transactionalEntityManager.save(newProject);
-
-        // default cols for this project
-        const cols = await this.kanbanService.createDefaultCols({
-          projectId: newProject.id,
-        });
-        await transactionalEntityManager.save(cols);
-
-        return savedProject;
+        return await transactionalEntityManager.save(newProject);
       },
     );
   }
 
-  async findAll({ workspaceId }: { workspaceId: string }) {
+  async findWorkspaceProjects({ workspaceId }: { workspaceId: string }) {
     return this.projectRepository.find({
       where: { workspaceId },
     });

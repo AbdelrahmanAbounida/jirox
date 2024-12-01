@@ -9,8 +9,7 @@ import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TasksFilters from "@/components/tasks/tasks-filters";
 import NewTaskmodal from "./modals/new-task-modal";
-import { useProjectTasks } from "@/hooks/tasks/use-project-tasks";
-import { useWorkspaceTasks } from "@/hooks/workspaces/use-workspace-tasks";
+import { useWorkspaceTasks } from "@/hooks/tasks/use-workspace-tasks";
 
 const MyTasks = ({
   projectId,
@@ -64,7 +63,7 @@ const MyTasks = ({
           />
         </TabsContent>
         <TabsContent value="kanban" className="w-full h-full  ">
-          <TasksKanban workspaceTasks={workspaceTasks!} isLoading={isLoading} />
+          <TasksKanban workspaceId={workspaceId!} projectId={projectId} />
         </TabsContent>
         <TabsContent value="calendar" className="w-full h-full ">
           <TasksCalendar

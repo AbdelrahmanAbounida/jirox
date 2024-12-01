@@ -3,18 +3,11 @@ import { CSS } from "@dnd-kit/utilities";
 import { useMemo, useState } from "react";
 import { cva } from "class-variance-authority";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { TaskCard } from "./task-card";
-import { BoardColumnProps, ColumnDragData } from "@/schemas/drag-schemas";
-import {
-  DotIcon,
-  DotsHorizontalIcon,
-  DotsVerticalIcon,
-} from "@radix-ui/react-icons";
+import { BoardColumnProps, ColumnDragData } from "@/types/drag";
 import ColumnDropdown from "./utils/col-dropdown";
 import EmptyTask from "./utils/empty-task";
 import { Input } from "@/components/ui/input";
-// import { renameCol } from "@/actions/col/update-cols";
 
 export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
   const tasksIds = useMemo(() => {
@@ -35,7 +28,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
       column,
     } satisfies ColumnDragData,
     attributes: {
-      roleDescription: `Column: ${column.title}`,
+      roleDescription: `Column: ${column.name}`,
     },
   });
 
@@ -58,7 +51,7 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
   );
 
   // new col title
-  const [newcolTitle, setnewcolTitle] = useState(column.title);
+  const [newcolTitle, setnewcolTitle] = useState(column.name);
 
   return (
     <div className=" w-[320px] flex flex-col max-h-[700px] overflow-auto scrollbar-custom">
@@ -74,13 +67,11 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
         })}
       >
         <CardHeader
-          // any child u wanna prevent drag on
           onMouseDown={(event) => {
             event.stopPropagation();
           }}
           className="w-[280px]  p-0 font-semibold my-2 text-left flex flex-row cursor-default justify-between items-center"
         >
-          {/* <span className="">{column.title}</span> */}
           <Input
             className="border-0 focus:p-2 flex-1 shadow-none font-semibold text-sm p-0 focus:border"
             value={newcolTitle}
@@ -91,7 +82,8 @@ export function BoardColumn({ column, tasks, isOverlay }: BoardColumnProps) {
           <ColumnDropdown column={column} />
         </CardHeader>
         <div
-          // {...attributes} {...listeners}
+          {...attributes}
+          {...listeners}
           className="drag-area overflow-x-hidden "
         >
           <CardContent className="flex flex-grow flex-col gap-2  p-3 ">

@@ -1,4 +1,4 @@
-import { getProjectTasks } from "@/services/tasks/get-project-tasks";
+import { getProjectTasks } from "@/services/tasks/get-tasks";
 import useSWR from "swr";
 
 const fetcher = async ([key, projectId]: [string, string]) => {
