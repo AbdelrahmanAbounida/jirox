@@ -5,6 +5,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { db } from "@/lib/db";
 import { getUserById } from "./actions/auth/user";
 import { generateAccessToken } from "./actions/auth/generate-access-token";
+import { UserRole } from "@prisma/client";
 
 /**
  *
@@ -15,6 +16,7 @@ declare module "next-auth" {
   interface Session {
     user: DefaultSession["user"] & {
       isauth: boolean;
+      role: UserRole;
     };
     accessToken: string;
   }
