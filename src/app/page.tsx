@@ -1,18 +1,18 @@
 "use client";
-import { logout } from "@/actions/auth/logout";
-import { Button } from "@/components/ui/button";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return (
-    <main className="">
-      <Button
-        className=""
-        onClick={() => {
-          logout();
-        }}
-      >
-        Logout
-      </Button>
-    </main>
-  );
+  return redirect("/workspaces");
+  //   return (
+  //     <main className="">
+  //       <Button
+  //         className=""
+  //         onClick={() => {
+  //           logout();
+  //         }}
+  //       >
+  //         Logout
+  //       </Button>
+  //     </main>
+  //   );
 }
